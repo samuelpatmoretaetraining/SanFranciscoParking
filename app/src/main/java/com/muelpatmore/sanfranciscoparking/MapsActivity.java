@@ -8,11 +8,16 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
-    public static final LatLng DEFAULT_LOCATION = new LatLng(37.793233, -122.443199);
+    public static final String TAG = "MapsActivity";
+
+    private static final LatLng DEFAULT_LOCATION = new LatLng(37.793233, -122.443199);
+    private LatLngBounds SAN_FRANCISCO = new LatLngBounds(
+            new LatLng(37.692100, -122.521307), new LatLng(37.813489, -122.354833));
     private GoogleMap mMap;
 
     @Override
@@ -39,8 +44,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
+        // Restrict map to San Francisco
+        mMap.setLatLngBoundsForCameraTarget(SAN_FRANCISCO);
+
         // Add a marker in Sydney and move the camera
         mMap.addMarker(new MarkerOptions().position(DEFAULT_LOCATION).title("User location"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(DEFAULT_LOCATION));
+        mMap.moveCamera(CameraUpdateFactory.zoomTo(18f));
     }
 }
