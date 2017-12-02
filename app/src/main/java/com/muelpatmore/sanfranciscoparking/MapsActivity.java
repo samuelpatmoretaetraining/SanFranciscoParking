@@ -28,7 +28,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private DataManager mDataManager;
     private GoogleMap mMap;
 
-    private static final LatLng DEFAULT_LOCATION = new LatLng(37.793233, -122.443199);
+
+    //private static final LatLng DEFAULT_LOCATION = new LatLng(37.793233, -122.443199);
+    private static final LatLng DEFAULT_LOCATION = new LatLng(37.779062, -122.408523);
     private LatLngBounds SAN_FRANCISCO = new LatLngBounds(
             new LatLng(37.692100, -122.521307), new LatLng(37.813489, -122.354833));
 
