@@ -4,6 +4,9 @@ import android.graphics.Color;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -14,6 +17,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.muelpatmore.sanfranciscoparking.NetworkModels.ParkingListModel;
 import com.muelpatmore.sanfranciscoparking.NetworkModels.PointModel;
 import com.muelpatmore.sanfranciscoparking.messages.ParkingSpotsDataRecieved;
 
@@ -23,9 +27,13 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 import static com.google.android.gms.maps.model.BitmapDescriptorFactory.HUE_CYAN;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity
+        implements OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener {
 
     private static final String TAG = "MapsActivity";
     private static final LatLng DEFAULT_LOCATION = new LatLng(37.779062, -122.408523);
@@ -51,6 +59,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // test API
         mDataManager.fetchParkingSpots(userLocation);
+
     }
 
     /**
@@ -69,6 +78,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Restrict map to San Francisco
         mMap.setLatLngBoundsForCameraTarget(SAN_FRANCISCO);
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
+
+        mMap.setOnInfoWindowClickListener(this);
     }
 
     private void plotAndFocusOnUser() {
@@ -92,10 +103,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.clear();
         for (PointModel r : pointList) {
             float color = r.isReserved() ? BitmapDescriptorFactory.HUE_GREEN : BitmapDescriptorFactory.HUE_ROSE;
+            String snippet = r.isReserved() ? "Reserved" : "Empty";
             mMap.addMarker(new MarkerOptions()
                     .position(r.getLocation())
+                    .title(String.valueOf(r.getId()))
+                    .snippet(snippet)
                     .icon(BitmapDescriptorFactory
                             .defaultMarker(color)));
+
         }
         plotAndFocusOnUser();
     }
@@ -105,5 +120,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onStop();
         EventBus.getDefault().unregister(this);
         mDataManager.onStop();
+    }
+
+
+
+    @Override
+    public void onInfoWindowClick(Marker marker) {
+
+        Toast.makeText(this, "Info window clicked",
+                Toast.LENGTH_SHORT).show();
     }
 }
