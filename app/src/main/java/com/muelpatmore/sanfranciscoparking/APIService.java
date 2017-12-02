@@ -55,7 +55,7 @@ public class APIService implements APIServiceInterface {
                     s == null) { return false; }
                     LatLng stop = new LatLng(s.getLat(), s.getLng());
                     double distance = SphericalUtil.computeDistanceBetween(location, stop);
-                    Log.i(TAG, ""+s.getId()+" -distance-"+distance+"m");
+                    //Log.i(TAG, ""+s.getId()+" -distance-"+distance+"m");
                     return distance < new Double(250);
                 })
                 .map(s -> {

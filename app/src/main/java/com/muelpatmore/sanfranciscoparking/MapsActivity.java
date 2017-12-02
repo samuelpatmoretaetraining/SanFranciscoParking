@@ -1,5 +1,6 @@
 package com.muelpatmore.sanfranciscoparking;
 
+import android.graphics.Color;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -8,6 +9,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -21,18 +23,20 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 
+import static com.google.android.gms.maps.model.BitmapDescriptorFactory.HUE_CYAN;
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
-    public static final String TAG = "MapsActivity";
+    private static final String TAG = "MapsActivity";
+    private static final LatLng DEFAULT_LOCATION = new LatLng(37.779062, -122.408523);
+    private static final LatLngBounds SAN_FRANCISCO = new LatLngBounds(
+            new LatLng(37.692100, -122.521307), new LatLng(37.813489, -122.354833));
 
     private DataManager mDataManager;
     private GoogleMap mMap;
 
+    private LatLng userLocation = DEFAULT_LOCATION;
 
-    //private static final LatLng DEFAULT_LOCATION = new LatLng(37.793233, -122.443199);
-    private static final LatLng DEFAULT_LOCATION = new LatLng(37.779062, -122.408523);
-    private LatLngBounds SAN_FRANCISCO = new LatLngBounds(
-            new LatLng(37.692100, -122.521307), new LatLng(37.813489, -122.354833));
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +50,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
         // test API
-        mDataManager.fetchParkingSpots(DEFAULT_LOCATION);
+        mDataManager.fetchParkingSpots(userLocation);
     }
 
     /**
@@ -64,10 +68,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Restrict map to San Francisco
         mMap.setLatLngBoundsForCameraTarget(SAN_FRANCISCO);
+        mMap.getUiSettings().setMyLocationButtonEnabled(true);
+    }
 
-        // Add a marker in Sydney and move the camera
-        mMap.addMarker(new MarkerOptions().position(DEFAULT_LOCATION).title("User location"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(DEFAULT_LOCATION));
+    private void plotAndFocusOnUser() {
+        mMap.addMarker(new MarkerOptions()
+                .position(userLocation)
+                .title("User location")
+                .icon(BitmapDescriptorFactory
+                        .defaultMarker(HUE_CYAN)));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(userLocation));
         mMap.moveCamera(CameraUpdateFactory.zoomTo(17f));
     }
 
@@ -81,16 +91,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // clear all markers on the map
         mMap.clear();
         for (PointModel r : pointList) {
-            Marker marker = mMap.addMarker(new MarkerOptions()
+            float color = r.isReserved() ? BitmapDescriptorFactory.HUE_GREEN : BitmapDescriptorFactory.HUE_ROSE;
+            mMap.addMarker(new MarkerOptions()
                     .position(r.getLocation())
-                    .title(String.valueOf(r.getId()))
-                    .draggable(false));
+                    .icon(BitmapDescriptorFactory
+                            .defaultMarker(color)));
         }
-        // add user and refocus frustum.
-        mMap.addMarker(new MarkerOptions().position(DEFAULT_LOCATION).title("User location"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(DEFAULT_LOCATION));
-        mMap.moveCamera(CameraUpdateFactory.zoomTo(17f));
+        plotAndFocusOnUser();
     }
+
 
     public void onStop() {
         super.onStop();
