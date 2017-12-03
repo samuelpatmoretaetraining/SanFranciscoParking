@@ -9,15 +9,11 @@ import android.content.Context;
 
 public class ParkingApp extends Application {
 
-    private static Context mContext;
+    private Context mContext;
 
     @Override
     public void onCreate() {
         super.onCreate();
         mContext = this.getApplicationContext();
-    }
-
-    public static Context getContext() {
-        return mContext;
     }
 }

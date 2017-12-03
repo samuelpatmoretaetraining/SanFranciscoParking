@@ -1,6 +1,6 @@
 package com.muelpatmore.sanfranciscoparking.messages;
 
-import com.muelpatmore.sanfranciscoparking.NetworkModels.ParkingSpaceModel;
+import com.muelpatmore.sanfranciscoparking.networkmodels.ParkingSpaceModel;
 
 /**
  * Created by Samuel on 02/12/2017.

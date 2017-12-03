@@ -1,4 +1,4 @@
-package com.muelpatmore.sanfranciscoparking.NetworkModels;
+package com.muelpatmore.sanfranciscoparking.networkmodels;
 
 import com.google.android.gms.maps.model.LatLng;
 

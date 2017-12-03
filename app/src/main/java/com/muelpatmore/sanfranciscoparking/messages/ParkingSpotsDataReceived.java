@@ -1,6 +1,6 @@
 package com.muelpatmore.sanfranciscoparking.messages;
 
-import com.muelpatmore.sanfranciscoparking.NetworkModels.PointModel;
+import com.muelpatmore.sanfranciscoparking.networkmodels.PointModel;
 
 import java.util.ArrayList;
 

@@ -1,8 +1,4 @@
-package com.muelpatmore.sanfranciscoparking.NetworkModels;
-
-/**
- * Created by Samuel on 01/12/2017.
- */
+package com.muelpatmore.sanfranciscoparking.networkmodels;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

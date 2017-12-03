@@ -1,9 +1,7 @@
 package com.muelpatmore.sanfranciscoparking;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.muelpatmore.sanfranciscoparking.NetworkModels.ParkingSpaceModel;
-
-import org.jetbrains.annotations.NotNull;
+import com.muelpatmore.sanfranciscoparking.networkmodels.ParkingSpaceModel;
 
 /**
  * Created by Samuel on 01/12/2017.

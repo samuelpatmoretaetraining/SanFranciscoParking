@@ -5,8 +5,9 @@ import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.SphericalUtil;
-import com.muelpatmore.sanfranciscoparking.NetworkModels.ParkingSpaceModel;
-import com.muelpatmore.sanfranciscoparking.NetworkModels.PointModel;
+import com.muelpatmore.sanfranciscoparking.messages.ParkingSpotReservedConfirmation;
+import com.muelpatmore.sanfranciscoparking.networkmodels.ParkingSpaceModel;
+import com.muelpatmore.sanfranciscoparking.networkmodels.PointModel;
 import com.muelpatmore.sanfranciscoparking.messages.IndividualParkingSpotReceived;
 import com.muelpatmore.sanfranciscoparking.messages.ParkingSpotsDataReceived;
 import com.muelpatmore.sanfranciscoparking.networkutils.ScheduleProvider;
@@ -27,10 +28,10 @@ import io.reactivex.functions.Consumer;
 
 public class APIService implements APIServiceInterface {
 
-    public static final String TAG = "APIService";
+    private static final String TAG = "APIService";
 
-    private CompositeDisposable mCompositeDisposable;
-    private ScheduleProvider mScheduleProvider;
+    private final CompositeDisposable mCompositeDisposable;
+    private final ScheduleProvider mScheduleProvider;
 
     public APIService() {
         mCompositeDisposable = new CompositeDisposable();
@@ -55,7 +56,7 @@ public class APIService implements APIServiceInterface {
                     LatLng stop = new LatLng(s.getLat(), s.getLng());
                     double distance = SphericalUtil.computeDistanceBetween(location, stop);
                     //Log.i(TAG, ""+s.getId()+" -distance-"+distance+"m");
-                    return distance < new Double(250);
+                    return distance < 250.0f;
                 })
                 .map(s -> {
                     /*Log.i(TAG, "Conversion to PointModel");*/
@@ -68,24 +69,16 @@ public class APIService implements APIServiceInterface {
                 .toList()
                 .observeOn(mScheduleProvider.ui())
                 .subscribeOn(mScheduleProvider.io())
-                .subscribe(new Consumer<List<PointModel>>() {
-                               @Override
-                               public void accept(List<PointModel> pointModelList) throws Exception {
-                                   ArrayList<PointModel> pointModelArrayList = new ArrayList<>(pointModelList);
-                                   Log.i(TAG, pointModelArrayList.size()+" valid entries found.");
-                                   EventBus.getDefault().post(
-                                           new ParkingSpotsDataReceived(pointModelArrayList));
-                               }
-                           }, new Consumer<Throwable>() {
-                               @Override
-                               public void accept(Throwable throwable) throws Exception {
-                                   throwable.printStackTrace();
-                               }
-                           }
+                .subscribe(pointModelList -> {
+                    ArrayList<PointModel> pointModelArrayList = new ArrayList<>(pointModelList);
+                    Log.i(TAG, pointModelArrayList.size()+" valid entries found.");
+                    EventBus.getDefault().post(
+                            new ParkingSpotsDataReceived(pointModelArrayList));
+                }, Throwable::printStackTrace
                 ));
     }
 
-    public void fetchParkingSpotById(@NotNull final int id) {
+    public void fetchParkingSpotById(final int id) {
         mCompositeDisposable.add(
                 ServerConnection.getParkingConnection()
                 .getParkingSpot(id)
@@ -95,40 +88,31 @@ public class APIService implements APIServiceInterface {
                 })
                 .observeOn(mScheduleProvider.ui())
                 .subscribeOn(mScheduleProvider.io())
-                .subscribe(new Consumer<ParkingSpaceModel>() {
-                    @Override
-                    public void accept(ParkingSpaceModel parkingListModel) throws Exception {
-                        Log.i(TAG, "Parking space information recieved, id: "+parkingListModel.getId());
-                        EventBus.getDefault().post(new IndividualParkingSpotReceived(parkingListModel));
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        Log.i(TAG, "Exception thrown in getParkingSpaceById("+id+")");
-                        throwable.printStackTrace();
-                    }
+                .subscribe(parkingSpaceModel -> {
+                    Log.i(TAG, "Parking space information received, id: "+parkingSpaceModel.getId());
+                    EventBus.getDefault().post(new IndividualParkingSpotReceived(parkingSpaceModel));
+                }, throwable -> {
+                    Log.i(TAG, "Exception thrown in getParkingSpaceById("+id+")");
+                    throwable.printStackTrace();
                 }));
     }
 
-    public void reserveParkingSpot( @NotNull final int id, @NotNull final ParkingSpaceModel parkingSpaceModel) {
+    public void reserveParkingSpot( final int id, @NotNull final ParkingSpaceModel parkingSpaceModel) {
         mCompositeDisposable.add(
                 ServerConnection.getParkingConnection()
                         /*.reserveParkingSpot(id, reservationStatus)*/
                         .reserveParkingSpot(id, parkingSpaceModel)
                         .observeOn(mScheduleProvider.ui())
                         .subscribeOn(mScheduleProvider.io())
-                        .subscribe(new Consumer<ParkingSpaceModel>() {
-                            @Override
-                            public void accept(ParkingSpaceModel parkingListModel) throws Exception {
-                                Log.i(TAG, "Updated parking spot entry, id: "+parkingListModel.getId()+" to "+parkingListModel.getIsReserved());
-                                //EventBus.getDefault().post(new IndividualParkingSpotReceived(parkingListModel));
-                            }
-                        }, new Consumer<Throwable>() {
-                            @Override
-                            public void accept(Throwable throwable) throws Exception {
-                                Log.i(TAG, "Exception thrown in reserveParkingSpot("+id+")");
-                                throwable.printStackTrace();
-                            }
+                        .subscribe(parkingSpaceModel1 -> {
+                            Log.i(TAG, "Parking spot "+ parkingSpaceModel1.getId()+" reserved.");
+                            EventBus.getDefault().post(
+                                    new ParkingSpotReservedConfirmation(
+                                            parkingSpaceModel1.getIsReserved(),
+                                            parkingSpaceModel1.getReservedUntil()));
+                        }, throwable -> {
+                            Log.i(TAG, "Exception thrown in reserveParkingSpot("+id+")");
+                            throwable.printStackTrace();
                         }));
     }
 

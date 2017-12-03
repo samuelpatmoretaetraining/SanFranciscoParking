@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -19,8 +20,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.muelpatmore.sanfranciscoparking.NetworkModels.ParkingSpaceModel;
-import com.muelpatmore.sanfranciscoparking.NetworkModels.PointModel;
+import com.muelpatmore.sanfranciscoparking.messages.ParkingSpotReservedConfirmation;
+import com.muelpatmore.sanfranciscoparking.networkmodels.ParkingSpaceModel;
+import com.muelpatmore.sanfranciscoparking.networkmodels.PointModel;
 import com.muelpatmore.sanfranciscoparking.messages.IndividualParkingSpotReceived;
 import com.muelpatmore.sanfranciscoparking.messages.ParkingSpotsDataReceived;
 
@@ -92,7 +94,7 @@ public class MapsActivity extends FragmentActivity
                 17f,
                 mMap.getCameraPosition().tilt, //use old tilt
                 mMap.getCameraPosition().bearing); //use old bearing
-        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(newCamPos), 4000, null);
+        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(newCamPos), 3000, null);
 
         mMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
             @Override
@@ -121,13 +123,25 @@ public class MapsActivity extends FragmentActivity
     public void onMessageEvent(ParkingSpotsDataReceived event) {
         Log.i(TAG, "ParkingSpotsDataReceived, size: "+event.getPoints().size());
         plotMapMarkers(event.getPoints());
-    };
+    }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(IndividualParkingSpotReceived event) {
         Log.i(TAG, "IndividualParkingSpotsReceived, id: "+event.getParkingSpot().getId());
         showParkingDetailsSnackbar(event.getParkingSpot());
-    };
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(ParkingSpotReservedConfirmation event) {
+        if(event.isReservationStatus()) {
+            String reservedUntil = event.getReservedUntil();
+            reservedUntil = reservedUntil.substring(11,reservedUntil.length()-11);
+            Toast.makeText(this, "Parking space reserved until "+reservedUntil, Toast.LENGTH_SHORT).show();
+            fetchParkingSpacesNearUser();
+        } else {
+            Toast.makeText(this, "Reservation failed, please try again", Toast.LENGTH_SHORT).show();
+        }
+    }
 
     private void plotMapMarkers(ArrayList<PointModel> pointList) {
         // clear all markers on the map
@@ -165,11 +179,11 @@ public class MapsActivity extends FragmentActivity
 
     @Override
     public void onInfoWindowClick(Marker marker) {
-        //ToDo change this to z-indez for faster results.
-        if (! marker.getTitle().equals(getResources().getString(R.string.user_location))) {
+        // React to all markers except user location (z-index of 1)
+        if (marker.getZIndex() == 0) {
             mDataManager.fetchParkingSpotById(Integer.valueOf(marker.getTitle()));
         }
-        //Toast.makeText(this, "Info window clicked",Toast.LENGTH_SHORT).show();
+
     }
 
     private void showParkingDetailsSnackbar(ParkingSpaceModel parkingSpace) {
@@ -183,7 +197,7 @@ public class MapsActivity extends FragmentActivity
         View snackView = inflater.inflate(R.layout.parking_info_bubble, null);
 
         // Configure the view
-        Log.i(TAG, "posting parking space details to snackbar "+parkingSpace.getId());
+        Log.i(TAG, "posting parking space details to Snackbar "+parkingSpace.getId());
         TextView tvParkingSpaceId = (TextView) snackView.findViewById(R.id.tvParkingSpaceId);
         Log.i(TAG,tvParkingSpaceId.getText().toString());
         tvParkingSpaceId.setText(parkingSpace.getId().toString());
@@ -204,12 +218,9 @@ public class MapsActivity extends FragmentActivity
             btnParkingSpaceReserve.setBackgroundColor(getResources().getColor(R.color.colorButtonActive));
         }
 
-        btnParkingSpaceReserve.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                parkingSpace.setIsReserved(true);
-                mDataManager.reserveParkingSpot(parkingSpace.getId(), parkingSpace);
-            }
+        btnParkingSpaceReserve.setOnClickListener(v -> {
+            parkingSpace.setIsReserved(true);
+            mDataManager.reserveParkingSpot(parkingSpace.getId(), parkingSpace);
         });
 
         // Add the view to the Snackbar's layout
