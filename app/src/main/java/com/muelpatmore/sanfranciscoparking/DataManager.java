@@ -25,6 +25,10 @@ public class DataManager implements APIServiceInterface {
         mAPIService.fetchParkingSpots(location);
     }
 
+    public void fetchParkingSpotById(int id) {
+        mAPIService.fetchParkingSpotById(id);
+    }
+
     public void onStop() {
         mAPIService.clearRequests();
     }

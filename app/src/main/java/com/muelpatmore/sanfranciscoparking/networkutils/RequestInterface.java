@@ -6,6 +6,7 @@ import java.util.List;
 
 import io.reactivex.Observable;
 import retrofit2.http.GET;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 /**
@@ -16,4 +17,7 @@ public interface RequestInterface {
 
     @GET(Network_Constants.PARKING_DATABASE)
     Observable<List<ParkingListModel>> getParkingList();
+
+    @GET(Network_Constants.PARKING_DATABASE+"/{id}")
+    Observable<ParkingListModel> getParkingSpot(@Path("id") int groupId);
 }

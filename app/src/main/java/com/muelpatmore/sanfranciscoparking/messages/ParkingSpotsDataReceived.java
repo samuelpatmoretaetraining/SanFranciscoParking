@@ -8,10 +8,10 @@ import java.util.ArrayList;
  * Created by Samuel on 01/12/2017.
  */
 
-public class ParkingSpotsDataRecieved {
+public class ParkingSpotsDataReceived {
     private ArrayList<PointModel> points;
 
-    public ParkingSpotsDataRecieved(ArrayList<PointModel> points) {
+    public ParkingSpotsDataReceived(ArrayList<PointModel> points) {
         this.points = points;
     }
 

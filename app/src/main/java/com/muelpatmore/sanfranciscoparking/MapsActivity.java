@@ -1,10 +1,12 @@
 package com.muelpatmore.sanfranciscoparking;
 
-import android.graphics.Color;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,16 +21,14 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.muelpatmore.sanfranciscoparking.NetworkModels.ParkingListModel;
 import com.muelpatmore.sanfranciscoparking.NetworkModels.PointModel;
-import com.muelpatmore.sanfranciscoparking.messages.ParkingSpotsDataRecieved;
+import com.muelpatmore.sanfranciscoparking.messages.IndividualParkingSpotReceived;
+import com.muelpatmore.sanfranciscoparking.messages.ParkingSpotsDataReceived;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 import static com.google.android.gms.maps.model.BitmapDescriptorFactory.HUE_CYAN;
 
@@ -59,7 +59,7 @@ public class MapsActivity extends FragmentActivity
 
         // test API
         mDataManager.fetchParkingSpots(userLocation);
-
+        mDataManager.fetchParkingSpotById(1958);
     }
 
     /**
@@ -85,7 +85,7 @@ public class MapsActivity extends FragmentActivity
     private void plotAndFocusOnUser() {
         mMap.addMarker(new MarkerOptions()
                 .position(userLocation)
-                .title("User location")
+                .title(getResources().getString(R.string.user_location))
                 .icon(BitmapDescriptorFactory
                         .defaultMarker(HUE_CYAN)));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(userLocation));
@@ -93,9 +93,15 @@ public class MapsActivity extends FragmentActivity
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onMessageEvent(ParkingSpotsDataRecieved event) {
-        Log.i(TAG, "ParkingSpotsDataRecieved, size: "+event.getPoints().size());
+    public void onMessageEvent(ParkingSpotsDataReceived event) {
+        Log.i(TAG, "ParkingSpotsDataReceived, size: "+event.getPoints().size());
         plotMapMarkers(event.getPoints());
+    };
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(IndividualParkingSpotReceived event) {
+        Log.i(TAG, "IndividualParkingSpotsReceived, id: "+event.getParkingSpot().getId());
+        showParkingDetailsSnackbar(event.getParkingSpot());
     };
 
     private void plotMapMarkers(ArrayList<PointModel> pointList) {
@@ -104,13 +110,13 @@ public class MapsActivity extends FragmentActivity
         for (PointModel r : pointList) {
             float color = r.isReserved() ? BitmapDescriptorFactory.HUE_GREEN : BitmapDescriptorFactory.HUE_ROSE;
             String snippet = r.isReserved() ? "Reserved" : "Empty";
-            mMap.addMarker(new MarkerOptions()
+            Marker m = mMap.addMarker(new MarkerOptions()
                     .position(r.getLocation())
                     .title(String.valueOf(r.getId()))
                     .snippet(snippet)
                     .icon(BitmapDescriptorFactory
                             .defaultMarker(color)));
-
+            Log.i(TAG, m.getTitle());
         }
         plotAndFocusOnUser();
     }
@@ -126,8 +132,47 @@ public class MapsActivity extends FragmentActivity
 
     @Override
     public void onInfoWindowClick(Marker marker) {
+        //ToDo change this to z-indez for faster results.
+        if (! marker.getTitle().equals(getResources().getString(R.string.user_location))) {
+            mDataManager.fetchParkingSpotById(Integer.valueOf(marker.getTitle()));
+        }
+        //Toast.makeText(this, "Info window clicked",Toast.LENGTH_SHORT).show();
+    }
 
-        Toast.makeText(this, "Info window clicked",
-                Toast.LENGTH_SHORT).show();
+    private void showParkingDetailsSnackbar(ParkingListModel parkingSpace) {
+        Snackbar snackbar = Snackbar.make(getWindow().getDecorView().getRootView(), "Test", 8000);
+        Snackbar.SnackbarLayout layout = (Snackbar.SnackbarLayout) snackbar.getView();
+        // Hide the default Snackbar TextView
+        TextView textView = (TextView) layout.findViewById(android.support.design.R.id.snackbar_text);
+        textView.setVisibility(View.INVISIBLE);
+
+        LayoutInflater inflater = LayoutInflater.from(getApplicationContext());
+        View snackView = inflater.inflate(R.layout.parking_info_bubble, null);
+
+        // Configure the view
+        Log.i(TAG, "posting parking space details to snackbar "+parkingSpace.getId());
+        TextView tvParkingSpaceId = (TextView) snackView.findViewById(R.id.tvParkingSpaceId);
+        Log.i(TAG,tvParkingSpaceId.getText().toString());
+        tvParkingSpaceId.setText(parkingSpace.getId().toString());
+
+        /*
+        TextView tvParkingSpaceCoords = (TextView) snackView.findViewById(R.id.tvParkingSpaceCoords);
+        String parkingSpaceCoords = Double.toString(parkingSpace.getLat())+ ", "+ Double.toString(parkingSpace.getLng());
+        tvParkingSpaceCoords.setText(parkingSpaceCoords);
+
+        Button btnParkingSpaceReserve = (Button) snackView.findViewById(R.id.btnParkingSpaceReserve);
+        if (parkingSpace.getIsReserved()) {
+            btnParkingSpaceReserve.setText("Reserved /n"+ "free at "+ parkingSpace.getReservedUntil());
+            btnParkingSpaceReserve.setBackgroundColor(getResources().getColor(R.color.colorButtonActive));
+        } else {
+            btnParkingSpaceReserve.setText("Click to reserve this space.");
+            btnParkingSpaceReserve.setBackgroundColor(getResources().getColor(R.color.colorButtonDisabled));
+        }*/
+
+        // Add the view to the Snackbar's layout
+        layout.addView(snackView, 0);
+        layout.setPadding(0, 0, 0, 0);
+        // Show the Snackbar
+        snackbar.show();
     }
 }
