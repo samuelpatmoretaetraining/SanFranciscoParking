@@ -1,4 +1,4 @@
-package com.muelpatmore.sanfranciscoparking.networkutils;
+package com.muelpatmore.sanfranciscoparking.data.network.networkutils;
 
 /**
  * Created by Samuel on 01/12/2017.

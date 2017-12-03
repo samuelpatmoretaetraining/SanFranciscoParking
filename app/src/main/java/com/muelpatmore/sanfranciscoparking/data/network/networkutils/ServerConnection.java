@@ -1,4 +1,4 @@
-package com.muelpatmore.sanfranciscoparking.networkutils;
+package com.muelpatmore.sanfranciscoparking.data.network.networkutils;
 
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 

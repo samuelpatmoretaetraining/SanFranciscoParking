@@ -1,4 +1,4 @@
-package com.muelpatmore.sanfranciscoparking.messages;
+package com.muelpatmore.sanfranciscoparking.data.messages;
 
 /**
  * Created by Samuel on 03/12/2017.

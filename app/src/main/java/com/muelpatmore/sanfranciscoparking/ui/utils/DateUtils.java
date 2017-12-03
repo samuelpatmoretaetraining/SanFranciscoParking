@@ -1,4 +1,4 @@
-package com.muelpatmore.sanfranciscoparking;
+package com.muelpatmore.sanfranciscoparking.ui.utils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

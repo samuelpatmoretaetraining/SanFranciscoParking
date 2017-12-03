@@ -1,24 +1,23 @@
-package com.muelpatmore.sanfranciscoparking;
+package com.muelpatmore.sanfranciscoparking.data.network;
 
 import android.location.Location;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.SphericalUtil;
-import com.muelpatmore.sanfranciscoparking.messages.ParkingSpotReservedConfirmation;
-import com.muelpatmore.sanfranciscoparking.networkmodels.ParkingSpaceModel;
-import com.muelpatmore.sanfranciscoparking.networkmodels.PointModel;
-import com.muelpatmore.sanfranciscoparking.messages.IndividualParkingSpotReceived;
-import com.muelpatmore.sanfranciscoparking.messages.ParkingSpotsDataReceived;
-import com.muelpatmore.sanfranciscoparking.networkutils.ScheduleProvider;
-import com.muelpatmore.sanfranciscoparking.networkutils.ServerConnection;
+import com.muelpatmore.sanfranciscoparking.data.messages.ParkingSpotReservedConfirmation;
+import com.muelpatmore.sanfranciscoparking.data.messages.IndividualParkingSpotReceived;
+import com.muelpatmore.sanfranciscoparking.data.messages.ParkingSpotsDataReceived;
+import com.muelpatmore.sanfranciscoparking.data.network.networkmodels.ParkingSpaceModel;
+import com.muelpatmore.sanfranciscoparking.data.network.networkmodels.PointModel;
+import com.muelpatmore.sanfranciscoparking.data.network.networkutils.ServerConnection;
+import com.muelpatmore.sanfranciscoparking.ui.utils.rx.SchedulerProvider;
 
 import org.greenrobot.eventbus.EventBus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TimeZone;
 
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Consumer;
@@ -32,11 +31,11 @@ public class APIService implements APIServiceInterface {
     private static final String TAG = "APIService";
 
     private final CompositeDisposable mCompositeDisposable;
-    private final ScheduleProvider mScheduleProvider;
+    private final SchedulerProvider mScheduleProvider;
 
     public APIService() {
         mCompositeDisposable = new CompositeDisposable();
-        mScheduleProvider = new ScheduleProvider();
+        mScheduleProvider = new SchedulerProvider();
 
 
     }
@@ -70,13 +69,19 @@ public class APIService implements APIServiceInterface {
                 .toList()
                 .observeOn(mScheduleProvider.ui())
                 .subscribeOn(mScheduleProvider.io())
-                .subscribe(pointModelList -> {
-                    ArrayList<PointModel> pointModelArrayList = new ArrayList<>(pointModelList);
-                    Log.i(TAG, pointModelArrayList.size()+" valid entries found.");
-                    EventBus.getDefault().post(
-                            new ParkingSpotsDataReceived(pointModelArrayList));
-                }, Throwable::printStackTrace
-                ));
+                .subscribe(new Consumer<List<PointModel>>() {
+                    @Override
+                    public void accept(List<PointModel> pointModels) throws Exception {
+                        ArrayList<PointModel> pointModelArrayList = new ArrayList<>(pointModels);
+                        Log.i(TAG, pointModelArrayList.size() + " valid entries found.");
+                        EventBus.getDefault().post(new ParkingSpotsDataReceived(pointModelArrayList));
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+
+                    }
+                }));
     }
 
     public void fetchParkingSpotById(final int id) {

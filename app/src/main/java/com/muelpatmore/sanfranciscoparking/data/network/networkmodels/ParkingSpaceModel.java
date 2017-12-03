@@ -1,4 +1,4 @@
-package com.muelpatmore.sanfranciscoparking.networkmodels;
+package com.muelpatmore.sanfranciscoparking.data.network.networkmodels;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

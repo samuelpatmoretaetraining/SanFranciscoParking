@@ -1,6 +1,7 @@
-package com.muelpatmore.sanfranciscoparking.messages;
+package com.muelpatmore.sanfranciscoparking.data.messages;
 
-import com.muelpatmore.sanfranciscoparking.networkmodels.PointModel;
+
+import com.muelpatmore.sanfranciscoparking.data.network.networkmodels.PointModel;
 
 import java.util.ArrayList;
 

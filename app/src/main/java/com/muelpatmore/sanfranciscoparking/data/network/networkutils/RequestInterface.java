@@ -1,6 +1,8 @@
-package com.muelpatmore.sanfranciscoparking.networkutils;
+package com.muelpatmore.sanfranciscoparking.data.network.networkutils;
 
-import com.muelpatmore.sanfranciscoparking.networkmodels.ParkingSpaceModel;
+
+
+import com.muelpatmore.sanfranciscoparking.data.network.networkmodels.ParkingSpaceModel;
 
 import java.util.List;
 

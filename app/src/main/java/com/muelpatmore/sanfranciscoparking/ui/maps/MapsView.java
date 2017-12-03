@@ -1,4 +1,4 @@
-package com.muelpatmore.sanfranciscoparking;
+package com.muelpatmore.sanfranciscoparking.ui.maps;
 
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -20,11 +20,14 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.muelpatmore.sanfranciscoparking.messages.ParkingSpotReservedConfirmation;
-import com.muelpatmore.sanfranciscoparking.networkmodels.ParkingSpaceModel;
-import com.muelpatmore.sanfranciscoparking.networkmodels.PointModel;
-import com.muelpatmore.sanfranciscoparking.messages.IndividualParkingSpotReceived;
-import com.muelpatmore.sanfranciscoparking.messages.ParkingSpotsDataReceived;
+import com.muelpatmore.sanfranciscoparking.data.DataManager;
+import com.muelpatmore.sanfranciscoparking.data.network.networkmodels.ParkingSpaceModel;
+import com.muelpatmore.sanfranciscoparking.data.network.networkmodels.PointModel;
+import com.muelpatmore.sanfranciscoparking.ui.utils.DateUtils;
+import com.muelpatmore.sanfranciscoparking.R;
+import com.muelpatmore.sanfranciscoparking.data.messages.ParkingSpotReservedConfirmation;
+import com.muelpatmore.sanfranciscoparking.data.messages.IndividualParkingSpotReceived;
+import com.muelpatmore.sanfranciscoparking.data.messages.ParkingSpotsDataReceived;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -32,10 +35,12 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 
-public class MapsActivity extends FragmentActivity
-        implements OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener {
+public class MapsView extends FragmentActivity implements
+        MapsViewInterface,
+        OnMapReadyCallback,
+        GoogleMap.OnInfoWindowClickListener {
 
-    private static final String TAG = "MapsActivity";
+    private static final String TAG = "MapsView";
     private static final LatLng DEFAULT_LOCATION = new LatLng(37.779062, -122.408523);
     private static final LatLngBounds SAN_FRANCISCO = new LatLngBounds(
             new LatLng(37.692100, -122.521307), new LatLng(37.813489, -122.354833));
@@ -212,7 +217,7 @@ public class MapsActivity extends FragmentActivity
         if (parkingSpace.getIsReserved()) {
             String reservedUntil = parkingSpace.getReservedUntil();
             if (reservedUntil.indexOf(".") != -1) {
-                // account for outlier date string
+                // account for outlier date strings
                 reservedUntil = reservedUntil.substring(11,reservedUntil.indexOf(".")+2);
             }
             btnParkingSpaceReserve.setText("Reserved"+System.getProperty("line.separator")+"free at "+ reservedUntil);
@@ -236,5 +241,50 @@ public class MapsActivity extends FragmentActivity
         layout.setPadding(0, 0, 0, 0);
         // Show the Snackbar
         snackbar.show();
+    }
+
+    @Override
+    public void showLoading() {
+
+    }
+
+    @Override
+    public void hideLoading() {
+
+    }
+
+    @Override
+    public void openActivityOnTokenExpire() {
+
+    }
+
+    @Override
+    public void onError(int resId) {
+
+    }
+
+    @Override
+    public void onError(String message) {
+
+    }
+
+    @Override
+    public void showMessage(String message) {
+
+    }
+
+    @Override
+    public void showMessage(int resId) {
+
+    }
+
+    @Override
+    public boolean isNetworkConnected() {
+        return false;
+    }
+
+    @Override
+    public void hideKeyboard() {
+
     }
 }
