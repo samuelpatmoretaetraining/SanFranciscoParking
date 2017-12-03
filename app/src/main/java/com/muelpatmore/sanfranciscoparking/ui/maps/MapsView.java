@@ -47,6 +47,7 @@ public class MapsView extends FragmentActivity implements
     private static final LatLngBounds SAN_FRANCISCO = new LatLngBounds(
             new LatLng(37.692100, -122.521307), new LatLng(37.813489, -122.354833));
 
+    private MapsPresenter mMapsPresenter;
     private DataManager mDataManager;
     private GoogleMap mMap;
     private Marker userMarker;
@@ -61,6 +62,7 @@ public class MapsView extends FragmentActivity implements
         setContentView(R.layout.activity_maps);
         pointList = new ArrayList<>();
         mDataManager = new DataManager();
+        mMapsPresenter = new MapsPresenter();
         if (savedInstanceState != null) {
             pointList = savedInstanceState.getParcelableArrayList("marker list");
         }
@@ -79,11 +81,23 @@ public class MapsView extends FragmentActivity implements
         mapFragment.getMapAsync(this);
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mMapsPresenter.onAttach(this);
+    }
+
+    @Override
+    public LatLng getUserLocation() {
+        return userLocation;
+    }
+
     /**
      * Set new location of user.
      * Will reset to default if the position is null or outside the bounds of San Francisco.
      */
-    public void setUserLocation(@NotNull LatLng userLocation) {
+    @Override
+    public void setUserLocation(LatLng userLocation) {
         if (userLocation != null && SAN_FRANCISCO.contains(userLocation)) {
             this.userLocation = userLocation;
         } else {
@@ -112,8 +126,12 @@ public class MapsView extends FragmentActivity implements
 
         mMap.setOnInfoWindowClickListener(this);
 
-        fetchParkingSpacesNearUser();
+        mMapsPresenter.fetchParkingSpacesNear(userLocation);
 
+    }
+
+    public GoogleMap getMap() {
+        return mMap;
     }
 
     /**
@@ -123,7 +141,8 @@ public class MapsView extends FragmentActivity implements
      * User location is reset to application default value if it is null or outside the set bounds
      * of San Francisco.
      */
-    private void plotAndFocusOnUser() {
+    @Override
+    public void plotAndFocusOnUser() {
         userMarker = mMap.addMarker(new MarkerOptions()
                 .position(userLocation)
                 .title(getResources().getString(R.string.user_location))
@@ -151,15 +170,9 @@ public class MapsView extends FragmentActivity implements
             @Override
             public void onMarkerDragEnd(Marker marker) {
                 userLocation = marker.getPosition();
-                fetchParkingSpacesNearUser();
+                mMapsPresenter.fetchParkingSpacesNear(marker.getPosition());
             }
         });
-    }
-
-    private void fetchParkingSpacesNearUser() {
-        mMap.clear();
-        mDataManager.fetchParkingSpots(userLocation);
-        plotAndFocusOnUser();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -181,7 +194,7 @@ public class MapsView extends FragmentActivity implements
 
             reservedUntil = reservedUntil.substring(11,reservedUntil.indexOf(".")+2);
             Toast.makeText(this, "Parking space reserved until "+reservedUntil, Toast.LENGTH_SHORT).show();
-            fetchParkingSpacesNearUser();
+            mMapsPresenter.fetchParkingSpacesNear(userLocation);
         } else {
             Toast.makeText(this, "Reservation failed, please try again", Toast.LENGTH_SHORT).show();
         }
@@ -227,6 +240,7 @@ public class MapsView extends FragmentActivity implements
     public void onStop() {
         super.onStop();
         EventBus.getDefault().unregister(this);
+        mMapsPresenter.onDetach();
     }
 
     @Override

@@ -1,5 +1,7 @@
 package com.muelpatmore.sanfranciscoparking.ui.maps;
 
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.LatLng;
 import com.muelpatmore.sanfranciscoparking.ui.base.MvpView;
 
 /**
@@ -7,4 +9,9 @@ import com.muelpatmore.sanfranciscoparking.ui.base.MvpView;
  */
 
 public interface MapsViewInterface extends MvpView {
+    void plotAndFocusOnUser();
+
+    LatLng getUserLocation();
+    void setUserLocation(LatLng userLocation);
+    GoogleMap getMap();
 }
