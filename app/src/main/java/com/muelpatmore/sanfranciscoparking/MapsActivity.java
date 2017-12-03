@@ -15,6 +15,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -31,6 +32,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 
 import static com.google.android.gms.maps.model.BitmapDescriptorFactory.HUE_CYAN;
+import static com.google.android.gms.maps.model.BitmapDescriptorFactory.HUE_ORANGE;
 
 public class MapsActivity extends FragmentActivity
         implements OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener {
@@ -42,6 +44,7 @@ public class MapsActivity extends FragmentActivity
 
     private DataManager mDataManager;
     private GoogleMap mMap;
+    private Marker userMarker;
 
     private LatLng userLocation = DEFAULT_LOCATION;
 
@@ -56,10 +59,6 @@ public class MapsActivity extends FragmentActivity
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
-        // test API
-        mDataManager.fetchParkingSpots(userLocation);
-        mDataManager.fetchParkingSpotById(1958);
     }
 
     /**
@@ -80,16 +79,47 @@ public class MapsActivity extends FragmentActivity
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
 
         mMap.setOnInfoWindowClickListener(this);
+
+        fetchParkingSpacesNearUser();
     }
 
     private void plotAndFocusOnUser() {
-        mMap.addMarker(new MarkerOptions()
+        userMarker = mMap.addMarker(new MarkerOptions()
                 .position(userLocation)
                 .title(getResources().getString(R.string.user_location))
+                .zIndex(1)
                 .icon(BitmapDescriptorFactory
-                        .defaultMarker(HUE_CYAN)));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(userLocation));
-        mMap.moveCamera(CameraUpdateFactory.zoomTo(17f));
+                        .defaultMarker(60f))
+                .draggable(true));
+//        mMap.moveCamera(CameraUpdateFactory.newLatLng(userLocation));
+//        mMap.moveCamera(CameraUpdateFactory.zoomTo(17f));
+        CameraPosition newCamPos = new CameraPosition(userLocation,
+                17f,
+                mMap.getCameraPosition().tilt, //use old tilt
+                mMap.getCameraPosition().bearing); //use old bearing
+        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(newCamPos), 4000, null);
+
+        mMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
+            @Override
+            public void onMarkerDragStart(Marker marker) {
+            }
+
+            @Override
+            public void onMarkerDrag(Marker marker) {
+            }
+
+            @Override
+            public void onMarkerDragEnd(Marker marker) {
+                userLocation = marker.getPosition();
+                fetchParkingSpacesNearUser();
+            }
+        });
+    }
+
+    private void fetchParkingSpacesNearUser() {
+        mMap.clear();
+        mDataManager.fetchParkingSpots(userLocation);
+        plotAndFocusOnUser();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -108,12 +138,23 @@ public class MapsActivity extends FragmentActivity
         // clear all markers on the map
         mMap.clear();
         for (PointModel r : pointList) {
-            float color = r.isReserved() ? BitmapDescriptorFactory.HUE_GREEN : BitmapDescriptorFactory.HUE_ROSE;
-            String snippet = r.isReserved() ? "Reserved" : "Empty";
+            float color, alpha;
+            String snippet;
+            if (r.isReserved()) {
+                snippet = "Reserved";
+                color = BitmapDescriptorFactory.HUE_RED;
+                alpha = 0.5f;
+            } else {
+                snippet = "Click to reserve";
+                color = BitmapDescriptorFactory.HUE_GREEN;
+                alpha = 1f;
+            }
+
             Marker m = mMap.addMarker(new MarkerOptions()
                     .position(r.getLocation())
                     .title(String.valueOf(r.getId()))
                     .snippet(snippet)
+                    .alpha(alpha)
                     .icon(BitmapDescriptorFactory
                             .defaultMarker(color)));
             Log.i(TAG, m.getTitle());
@@ -155,19 +196,21 @@ public class MapsActivity extends FragmentActivity
         Log.i(TAG,tvParkingSpaceId.getText().toString());
         tvParkingSpaceId.setText(parkingSpace.getId().toString());
 
-        /*
+
         TextView tvParkingSpaceCoords = (TextView) snackView.findViewById(R.id.tvParkingSpaceCoords);
         String parkingSpaceCoords = Double.toString(parkingSpace.getLat())+ ", "+ Double.toString(parkingSpace.getLng());
         tvParkingSpaceCoords.setText(parkingSpaceCoords);
 
         Button btnParkingSpaceReserve = (Button) snackView.findViewById(R.id.btnParkingSpaceReserve);
         if (parkingSpace.getIsReserved()) {
-            btnParkingSpaceReserve.setText("Reserved /n"+ "free at "+ parkingSpace.getReservedUntil());
-            btnParkingSpaceReserve.setBackgroundColor(getResources().getColor(R.color.colorButtonActive));
+            String reservedUntil = parkingSpace.getReservedUntil();
+            reservedUntil = reservedUntil.substring(11,reservedUntil.length()-11);
+            btnParkingSpaceReserve.setText("Reserved"+System.getProperty("line.separator")+"free at "+ reservedUntil);
+            btnParkingSpaceReserve.setBackgroundColor(getResources().getColor(R.color.colorButtonDisabled));
         } else {
             btnParkingSpaceReserve.setText("Click to reserve this space.");
-            btnParkingSpaceReserve.setBackgroundColor(getResources().getColor(R.color.colorButtonDisabled));
-        }*/
+            btnParkingSpaceReserve.setBackgroundColor(getResources().getColor(R.color.colorButtonActive));
+        }
 
         // Add the view to the Snackbar's layout
         layout.addView(snackView, 0);
