@@ -1,22 +1,26 @@
 package com.muelpatmore.sanfranciscoparking.data;
 
-import android.content.Context;
-
 import com.google.android.gms.maps.model.LatLng;
+import com.muelpatmore.sanfranciscoparking.ParkingApp;
+import com.muelpatmore.sanfranciscoparking.data.firebase.MyFirebaseMessagingService;
 import com.muelpatmore.sanfranciscoparking.data.network.APIService;
 import com.muelpatmore.sanfranciscoparking.data.network.networkmodels.ParkingSpaceModel;
+import com.muelpatmore.sanfranciscoparking.data.prefs.PreferencesHelper;
+import com.muelpatmore.sanfranciscoparking.data.prefs.PreferencesHelperInterface;
 
 /**
  * Created by Samuel on 01/12/2017.
  */
 
-public class DataManager implements DataManagerInterface {
+public class DataManager implements DataManagerInterface, PreferencesHelperInterface {
 
     private final APIService mAPIService;
+    private final PreferencesHelperInterface mPreferencesHelper;
     private final MyFirebaseMessagingService mMyFirebaseMessagingService;
 
     public DataManager() {
         mAPIService = new APIService();
+        mPreferencesHelper = new PreferencesHelper(ParkingApp.getContext());
         mMyFirebaseMessagingService = new MyFirebaseMessagingService();
     }
 
@@ -41,5 +45,25 @@ public class DataManager implements DataManagerInterface {
     @Override
     public void sendReservationNotification(String messageBody) {
         mMyFirebaseMessagingService.sendReservationNotification(messageBody);
+    }
+
+    @Override
+    public void setUsername(String username) {
+        mPreferencesHelper.setUsername(username);
+    }
+
+    @Override
+    public String getUsername() {
+        return mPreferencesHelper.getUsername();
+    }
+
+    @Override
+    public void setDefaultLocation(LatLng location) {
+        mPreferencesHelper.setDefaultLocation(location);
+    }
+
+    @Override
+    public LatLng getLocation() {
+        return mPreferencesHelper.getLocation();
     }
 }
