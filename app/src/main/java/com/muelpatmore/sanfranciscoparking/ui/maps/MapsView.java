@@ -1,5 +1,6 @@
 package com.muelpatmore.sanfranciscoparking.ui.maps;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentActivity;
@@ -48,20 +49,22 @@ public class MapsView extends FragmentActivity implements
             new LatLng(37.692100, -122.521307), new LatLng(37.813489, -122.354833));
 
     private MapsPresenter mMapsPresenter;
-    private DataManager mDataManager;
     private GoogleMap mMap;
     private Marker userMarker;
     private ArrayList<PointModel> pointList;
 
     private LatLng userLocation = DEFAULT_LOCATION;
 
+    /**
+     * Initialisation of initial state, rebuilt from savedInstance if it exists. Map fragment
+     * created and initialised, userLocation checked against city limits.
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EventBus.getDefault().register(this);
         setContentView(R.layout.activity_maps);
         pointList = new ArrayList<>();
-        mDataManager = new DataManager();
         mMapsPresenter = new MapsPresenter();
         if (savedInstanceState != null) {
             pointList = savedInstanceState.getParcelableArrayList("marker list");
@@ -175,31 +178,6 @@ public class MapsView extends FragmentActivity implements
         });
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onMessageEvent(ParkingSpotsDataReceived event) {
-        Log.i(TAG, "ParkingSpotsDataReceived, size: "+event.getPoints().size());
-        plotMapMarkers(event.getPoints());
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onMessageEvent(IndividualParkingSpotReceived event) {
-        Log.i(TAG, "IndividualParkingSpotsReceived, id: "+event.getParkingSpot().getId());
-        showParkingDetailsSnackbar(event.getParkingSpot());
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onMessageEvent(ParkingSpotReservedConfirmation event) {
-        if(event.isReservationStatus()) {
-            String reservedUntil = event.getReservedUntil();
-
-            reservedUntil = reservedUntil.substring(11,reservedUntil.indexOf(".")+2);
-            Toast.makeText(this, "Parking space reserved until "+reservedUntil, Toast.LENGTH_SHORT).show();
-            mMapsPresenter.fetchParkingSpacesNear(userLocation);
-        } else {
-            Toast.makeText(this, "Reservation failed, please try again", Toast.LENGTH_SHORT).show();
-        }
-    }
-
     /**
      * Plots a list of PointModel objects representing parking spaces to the map as custom markers.
      * All spaces display the Parking Spot id in an info bubble on click along with their reserved
@@ -207,7 +185,7 @@ public class MapsView extends FragmentActivity implements
      *
      * @param pointList Set of PointModel objects to plot on map.
      */
-    private void plotMapMarkers(List<PointModel> pointList) {
+    public void plotMapMarkers(List<PointModel> pointList) {
         // clear all markers on the map
         mMap.clear();
         this.pointList.clear();
@@ -239,20 +217,23 @@ public class MapsView extends FragmentActivity implements
 
     public void onStop() {
         super.onStop();
-        EventBus.getDefault().unregister(this);
         mMapsPresenter.onDetach();
+    }
+
+    public Context getContext() {
+        return this.getContext();
     }
 
     @Override
     public void onInfoWindowClick(Marker marker) {
         // React to all markers except user location (z-index of 1)
         if (marker.getZIndex() == 0) {
-            mDataManager.fetchParkingSpotById(Integer.valueOf(marker.getTitle()));
+            mMapsPresenter.parkingSpaceDetailsRequested(Integer.valueOf(marker.getTitle()));
         }
 
     }
 
-    private void showParkingDetailsSnackbar(ParkingSpaceModel parkingSpace) {
+    public void showParkingSpaceDetails(ParkingSpaceModel parkingSpace) {
         Snackbar snackbar = Snackbar.make(getWindow().getDecorView().getRootView(), "Test", 8000);
         Snackbar.SnackbarLayout layout = (Snackbar.SnackbarLayout) snackbar.getView();
         // Hide the default Snackbar TextView
@@ -278,7 +259,7 @@ public class MapsView extends FragmentActivity implements
             String reservedUntil = parkingSpace.getReservedUntil();
             if (reservedUntil.indexOf(".") != -1) {
                 // account for outlier date strings
-                reservedUntil = reservedUntil.substring(11,reservedUntil.indexOf(".")+2);
+                reservedUntil = reservedUntil.substring(11,reservedUntil.indexOf("."));
             }
             btnParkingSpaceReserve.setText("Reserved"+System.getProperty("line.separator")+"free at "+ reservedUntil);
             btnParkingSpaceReserve.setBackgroundColor(getResources().getColor(R.color.colorButtonDisabled));
@@ -293,7 +274,7 @@ public class MapsView extends FragmentActivity implements
             String reservedUntilString = DateUtils.dateStringFromNow(60); // Default reservation duration of 1 hour
             Log.i(TAG, "new reserved until value: "+reservedUntilString);
             parkingSpace.setReservedUntil(reservedUntilString);
-            mDataManager.reserveParkingSpot(parkingSpace.getId(), parkingSpace);
+            mMapsPresenter.reserveParkingSpot(parkingSpace.getId(), parkingSpace);
         });
 
         // Add the view to the Snackbar's layout
@@ -335,7 +316,8 @@ public class MapsView extends FragmentActivity implements
 
     @Override
     public void showMessage(String message) {
-
+        Log.i(TAG, message);
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
     @Override

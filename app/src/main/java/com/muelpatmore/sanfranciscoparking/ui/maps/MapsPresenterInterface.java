@@ -10,4 +10,5 @@ import com.muelpatmore.sanfranciscoparking.ui.base.MvpView;
 
 public interface MapsPresenterInterface<V extends MvpView> extends MvpPresenter <V>{
     void fetchParkingSpacesNear(LatLng location);
+    void parkingSpaceDetailsRequested(int id);
 }
