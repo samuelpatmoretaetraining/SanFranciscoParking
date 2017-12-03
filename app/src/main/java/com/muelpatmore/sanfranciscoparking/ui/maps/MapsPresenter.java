@@ -32,11 +32,19 @@ public class MapsPresenter<V extends MapsViewInterface> implements MapsPresenter
         EventBus.getDefault().register(this);
     }
 
+    /**
+     * Attach MapsView to Presenter to allow two way communication and data transfer.
+     * @param view MapsViewInterface object presenter is attached to.
+     */
     @Override
     public void onAttach(V view) {
         this.view = view;
     }
 
+    /**
+     * OnDetachment from MapsView unregister from EventBus thread lister and clear disposable
+     * requests in the DataManager.
+     */
     @Override
     public void onDetach() {
         mDataManager.onStop();
@@ -44,7 +52,8 @@ public class MapsPresenter<V extends MapsViewInterface> implements MapsPresenter
     }
 
     /**
-     * Calls API for parking spaces around current user location.
+     * Request for list of ParkingSpaces surrounding the given location. Confirmation by a
+     * ParkingSpotsDataReceived event.
      * @param location point around which to look for parking spaces.
      */
     public void fetchParkingSpacesNear(LatLng location) {
@@ -53,27 +62,49 @@ public class MapsPresenter<V extends MapsViewInterface> implements MapsPresenter
         view.plotAndFocusOnUser();
     }
 
+    /**
+     * Request for full details of ParkingSpace with given id. Confirmation by a
+     * IndividualParkingSpotReceived event.
+     * @param id id of requested ParkingSpace.
+     */
     public void parkingSpaceDetailsRequested(int id) {
         mDataManager.fetchParkingSpotById(id);
     }
 
+    /**
+     * Request that ParkingSpace entry with selected id is reserved & set to the status of the
+     * given ParkingSpace object. Confirmation by a ParkingSpotReservedConfirmation event.
+     * @param id id of ParkingSpace to update.
+     * @param parkingSpace model ParkingSpace object to replace current entry.
+     */
     public void reserveParkingSpot(int id, ParkingSpaceModel parkingSpace) {
         mDataManager.reserveParkingSpot(id, parkingSpace);
     }
 
-
+    /**
+     * Listener for result of parking spaces near location query that occurs on another thread.
+     * @param event Messenger class that reporting result of parking spaces near location query.
+     */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(ParkingSpotsDataReceived event) {
         Log.i(TAG, "ParkingSpotsDataReceived, size: "+event.getPoints().size());
         view.plotMapMarkers(event.getPoints());
     }
 
+    /**
+     * Listener for result of individual parking space lookup query that occurs on another thread.
+     * @param event Messenger class that reporting result of individual parking space lookup query.
+     */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(IndividualParkingSpotReceived event) {
         Log.i(TAG, "IndividualParkingSpotsReceived, id: "+event.getParkingSpot().getId());
         view.showParkingSpaceDetails(event.getParkingSpot());
     }
 
+    /**
+     * Listener for result of parking space reservation query that occurs on another thread.
+     * @param event Messenger class that reporting result of parking space reservation query.
+     */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(ParkingSpotReservedConfirmation event) {
         if(event.isReservationStatus()) {

@@ -215,6 +215,9 @@ public class MapsView extends FragmentActivity implements
         plotAndFocusOnUser();
     }
 
+    /**
+     * Detach from presenter.
+     */
     public void onStop() {
         super.onStop();
         mMapsPresenter.onDetach();
@@ -224,15 +227,23 @@ public class MapsView extends FragmentActivity implements
         return this.getContext();
     }
 
+    /**
+     * On click event on an info bubble pass request up to presenter.
+     * @param marker
+     */
     @Override
     public void onInfoWindowClick(Marker marker) {
         // React to all markers except user location (z-index of 1)
         if (marker.getZIndex() == 0) {
             mMapsPresenter.parkingSpaceDetailsRequested(Integer.valueOf(marker.getTitle()));
         }
-
     }
 
+    /**
+     * Create and display a custom Snackbar showing detailed ParkingSpace information and a button,
+     * to reserve space (if not currently reserved).
+     * @param parkingSpace
+     */
     public void showParkingSpaceDetails(ParkingSpaceModel parkingSpace) {
         Snackbar snackbar = Snackbar.make(getWindow().getDecorView().getRootView(), "Test", 8000);
         Snackbar.SnackbarLayout layout = (Snackbar.SnackbarLayout) snackbar.getView();
@@ -243,6 +254,7 @@ public class MapsView extends FragmentActivity implements
         LayoutInflater inflater = LayoutInflater.from(getApplicationContext());
         View snackView = inflater.inflate(R.layout.parking_info_bubble, null);
 
+        //ToDo use ButterKnife to bind views in custom snackbar layout.
         // Configure the view
         Log.i(TAG, "posting parking space details to Snackbar "+parkingSpace.getId());
         TextView tvParkingSpaceId = (TextView) snackView.findViewById(R.id.tvParkingSpaceId);
@@ -268,14 +280,18 @@ public class MapsView extends FragmentActivity implements
             btnParkingSpaceReserve.setBackgroundColor(getResources().getColor(R.color.colorButtonActive));
         }
 
-        btnParkingSpaceReserve.setOnClickListener(v -> {
-            parkingSpace.setIsReserved(true);
-            //ToDo add ability for user to select duration of stay.
-            String reservedUntilString = DateUtils.dateStringFromNow(60); // Default reservation duration of 1 hour
-            Log.i(TAG, "new reserved until value: "+reservedUntilString);
-            parkingSpace.setReservedUntil(reservedUntilString);
-            mMapsPresenter.reserveParkingSpot(parkingSpace.getId(), parkingSpace);
-        });
+        //Apply listener to button to reserve ParkingSpace if not currently reserved.
+        if( !parkingSpace.getIsReserved()) {
+            btnParkingSpaceReserve.setOnClickListener(v -> {
+                parkingSpace.setIsReserved(true);
+                //ToDo add ability for user to select duration of stay.
+                String reservedUntilString = DateUtils.dateStringFromNow(60); // Default reservation duration of 1 hour
+                Log.i(TAG, "new reserved until value: "+reservedUntilString);
+                parkingSpace.setReservedUntil(reservedUntilString);
+                mMapsPresenter.reserveParkingSpot(parkingSpace.getId(), parkingSpace);
+            });
+        }
+
 
         // Add the view to the Snackbar's layout
         layout.addView(snackView, 0);
