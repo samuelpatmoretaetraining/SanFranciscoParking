@@ -8,7 +8,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 
-public class ParkingListModel {
+public class ParkingSpaceModel {
 
         @SerializedName("id")
         @Expose
@@ -120,11 +120,11 @@ public class ParkingListModel {
             if (other == this) {
                 return true;
             }
-            if ((other instanceof ParkingListModel) == false) {
+            if ((other instanceof ParkingSpaceModel) == false) {
                 return false;
             }
-            ParkingListModel rhs = ((ChuckModel) other);
-            return new EqualsBuilder().ParkingListModel(reservedUntil, rhs.reservedUntil)
+            ParkingSpaceModel rhs = ((ChuckModel) other);
+            return new EqualsBuilder().ParkingSpaceModel(reservedUntil, rhs.reservedUntil)
                     .append(id, rhs.id).append(minReserveTimeMins, rhs.minReserveTimeMins)
                     .append(name, rhs.name).append(maxReserveTimeMins, rhs.maxReserveTimeMins)
                     .append(lng, rhs.lng).append(isReserved, rhs.isReserved)

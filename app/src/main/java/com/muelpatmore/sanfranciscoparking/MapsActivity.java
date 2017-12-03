@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -20,7 +19,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.muelpatmore.sanfranciscoparking.NetworkModels.ParkingListModel;
+import com.muelpatmore.sanfranciscoparking.NetworkModels.ParkingSpaceModel;
 import com.muelpatmore.sanfranciscoparking.NetworkModels.PointModel;
 import com.muelpatmore.sanfranciscoparking.messages.IndividualParkingSpotReceived;
 import com.muelpatmore.sanfranciscoparking.messages.ParkingSpotsDataReceived;
@@ -30,9 +29,6 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
-
-import static com.google.android.gms.maps.model.BitmapDescriptorFactory.HUE_CYAN;
-import static com.google.android.gms.maps.model.BitmapDescriptorFactory.HUE_ORANGE;
 
 public class MapsActivity extends FragmentActivity
         implements OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener {
@@ -47,7 +43,6 @@ public class MapsActivity extends FragmentActivity
     private Marker userMarker;
 
     private LatLng userLocation = DEFAULT_LOCATION;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -162,14 +157,11 @@ public class MapsActivity extends FragmentActivity
         plotAndFocusOnUser();
     }
 
-
     public void onStop() {
         super.onStop();
         EventBus.getDefault().unregister(this);
         mDataManager.onStop();
     }
-
-
 
     @Override
     public void onInfoWindowClick(Marker marker) {
@@ -180,7 +172,7 @@ public class MapsActivity extends FragmentActivity
         //Toast.makeText(this, "Info window clicked",Toast.LENGTH_SHORT).show();
     }
 
-    private void showParkingDetailsSnackbar(ParkingListModel parkingSpace) {
+    private void showParkingDetailsSnackbar(ParkingSpaceModel parkingSpace) {
         Snackbar snackbar = Snackbar.make(getWindow().getDecorView().getRootView(), "Test", 8000);
         Snackbar.SnackbarLayout layout = (Snackbar.SnackbarLayout) snackbar.getView();
         // Hide the default Snackbar TextView
@@ -211,6 +203,14 @@ public class MapsActivity extends FragmentActivity
             btnParkingSpaceReserve.setText("Click to reserve this space.");
             btnParkingSpaceReserve.setBackgroundColor(getResources().getColor(R.color.colorButtonActive));
         }
+
+        btnParkingSpaceReserve.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                parkingSpace.setIsReserved(true);
+                mDataManager.reserveParkingSpot(parkingSpace.getId(), parkingSpace);
+            }
+        });
 
         // Add the view to the Snackbar's layout
         layout.addView(snackView, 0);

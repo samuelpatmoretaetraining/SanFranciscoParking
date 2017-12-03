@@ -1,23 +1,23 @@
 package com.muelpatmore.sanfranciscoparking.messages;
 
-import com.muelpatmore.sanfranciscoparking.NetworkModels.ParkingListModel;
+import com.muelpatmore.sanfranciscoparking.NetworkModels.ParkingSpaceModel;
 
 /**
  * Created by Samuel on 02/12/2017.
  */
 
 public class IndividualParkingSpotReceived {
-    private ParkingListModel parkingSpot;
+    private ParkingSpaceModel parkingSpot;
 
-    public IndividualParkingSpotReceived(ParkingListModel parkingSpot) {
+    public IndividualParkingSpotReceived(ParkingSpaceModel parkingSpot) {
         this.parkingSpot = parkingSpot;
     }
 
-    public ParkingListModel getParkingSpot() {
+    public ParkingSpaceModel getParkingSpot() {
         return parkingSpot;
     }
 
-    public void setParkingSpot(ParkingListModel parkingSpot) {
+    public void setParkingSpot(ParkingSpaceModel parkingSpot) {
         this.parkingSpot = parkingSpot;
     }
 }

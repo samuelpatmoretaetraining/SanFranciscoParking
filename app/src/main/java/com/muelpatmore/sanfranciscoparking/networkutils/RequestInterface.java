@@ -1,13 +1,14 @@
 package com.muelpatmore.sanfranciscoparking.networkutils;
 
-import com.muelpatmore.sanfranciscoparking.NetworkModels.ParkingListModel;
+import com.muelpatmore.sanfranciscoparking.NetworkModels.ParkingSpaceModel;
 
 import java.util.List;
 
 import io.reactivex.Observable;
+import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.PUT;
 import retrofit2.http.Path;
-import retrofit2.http.Query;
 
 /**
  * Created by Samuel on 01/12/2017.
@@ -16,8 +17,11 @@ import retrofit2.http.Query;
 public interface RequestInterface {
 
     @GET(Network_Constants.PARKING_DATABASE)
-    Observable<List<ParkingListModel>> getParkingList();
+    Observable<List<ParkingSpaceModel>> getParkingList();
 
     @GET(Network_Constants.PARKING_DATABASE+"/{id}")
-    Observable<ParkingListModel> getParkingSpot(@Path("id") int groupId);
+    Observable<ParkingSpaceModel> getParkingSpot(@Path("id") int id);
+
+    @PUT(Network_Constants.PARKING_DATABASE+"/{id}")
+    Observable<ParkingSpaceModel> reserveParkingSpot(@Path("id") int id, @Body ParkingSpaceModel parkingSpaceModel);
 }

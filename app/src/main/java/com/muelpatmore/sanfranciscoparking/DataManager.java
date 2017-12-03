@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.muelpatmore.sanfranciscoparking.NetworkModels.ParkingSpaceModel;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -27,6 +28,11 @@ public class DataManager implements APIServiceInterface {
 
     public void fetchParkingSpotById(int id) {
         mAPIService.fetchParkingSpotById(id);
+    }
+
+    @Override
+    public void reserveParkingSpot(int id, ParkingSpaceModel parkingSpaceModel) {
+        mAPIService.reserveParkingSpot(id, parkingSpaceModel);
     }
 
     public void onStop() {

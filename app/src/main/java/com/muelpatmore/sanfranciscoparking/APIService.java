@@ -5,7 +5,7 @@ import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.SphericalUtil;
-import com.muelpatmore.sanfranciscoparking.NetworkModels.ParkingListModel;
+import com.muelpatmore.sanfranciscoparking.NetworkModels.ParkingSpaceModel;
 import com.muelpatmore.sanfranciscoparking.NetworkModels.PointModel;
 import com.muelpatmore.sanfranciscoparking.messages.IndividualParkingSpotReceived;
 import com.muelpatmore.sanfranciscoparking.messages.ParkingSpotsDataReceived;
@@ -95,9 +95,9 @@ public class APIService implements APIServiceInterface {
                 })
                 .observeOn(mScheduleProvider.ui())
                 .subscribeOn(mScheduleProvider.io())
-                .subscribe(new Consumer<ParkingListModel>() {
+                .subscribe(new Consumer<ParkingSpaceModel>() {
                     @Override
-                    public void accept(ParkingListModel parkingListModel) throws Exception {
+                    public void accept(ParkingSpaceModel parkingListModel) throws Exception {
                         Log.i(TAG, "Parking space information recieved, id: "+parkingListModel.getId());
                         EventBus.getDefault().post(new IndividualParkingSpotReceived(parkingListModel));
                     }
@@ -110,6 +110,27 @@ public class APIService implements APIServiceInterface {
                 }));
     }
 
+    public void reserveParkingSpot( @NotNull final int id, @NotNull final ParkingSpaceModel parkingSpaceModel) {
+        mCompositeDisposable.add(
+                ServerConnection.getParkingConnection()
+                        /*.reserveParkingSpot(id, reservationStatus)*/
+                        .reserveParkingSpot(id, parkingSpaceModel)
+                        .observeOn(mScheduleProvider.ui())
+                        .subscribeOn(mScheduleProvider.io())
+                        .subscribe(new Consumer<ParkingSpaceModel>() {
+                            @Override
+                            public void accept(ParkingSpaceModel parkingListModel) throws Exception {
+                                Log.i(TAG, "Updated parking spot entry, id: "+parkingListModel.getId()+" to "+parkingListModel.getIsReserved());
+                                //EventBus.getDefault().post(new IndividualParkingSpotReceived(parkingListModel));
+                            }
+                        }, new Consumer<Throwable>() {
+                            @Override
+                            public void accept(Throwable throwable) throws Exception {
+                                Log.i(TAG, "Exception thrown in reserveParkingSpot("+id+")");
+                                throwable.printStackTrace();
+                            }
+                        }));
+    }
 
     /**
      * Empty and clear current Observable store.
