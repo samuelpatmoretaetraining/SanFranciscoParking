@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "812231654384",
+    "firebase_url": "https://sfparking-d186c.firebaseio.com",
+    "project_id": "sfparking-d186c",
+    "storage_bucket": "sfparking-d186c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:812231654384:android:50d1da3ea7f53cf2",
+        "android_client_info": {
+          "package_name": "com.muelpatmore.sanfranciscoparking"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "812231654384-pvfohkr1dtbf08te7h5dbu4vidgn3pn8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCYXaNajwKLxkBwpnJyJLCeDS2KLEalauk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
