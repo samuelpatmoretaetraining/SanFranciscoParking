@@ -1,6 +1,6 @@
 package com.muelpatmore.sanfranciscoparking.ui.maps;
 
-import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -23,22 +23,18 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.muelpatmore.sanfranciscoparking.data.DataManager;
 import com.muelpatmore.sanfranciscoparking.data.network.networkmodels.ParkingSpaceModel;
 import com.muelpatmore.sanfranciscoparking.data.network.networkmodels.PointModel;
+import com.muelpatmore.sanfranciscoparking.ui.reservations.ReservationsActivityView;
 import com.muelpatmore.sanfranciscoparking.ui.utils.DateUtils;
 import com.muelpatmore.sanfranciscoparking.R;
-import com.muelpatmore.sanfranciscoparking.data.messages.ParkingSpotReservedConfirmation;
-import com.muelpatmore.sanfranciscoparking.data.messages.IndividualParkingSpotReceived;
-import com.muelpatmore.sanfranciscoparking.data.messages.ParkingSpotsDataReceived;
-
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class MapsView extends FragmentActivity implements
         MapsViewInterface,
@@ -54,8 +50,9 @@ public class MapsView extends FragmentActivity implements
     private GoogleMap mMap;
     private Marker userMarker;
     private ArrayList<PointModel> pointList;
-
     private LatLng userLocation = DEFAULT_LOCATION;
+
+    @BindView(R.id.btnReservations) Button btnParkingSpace;
 
     /**
      * Initialisation of initial state, rebuilt from savedInstance if it exists. Map fragment
@@ -68,6 +65,7 @@ public class MapsView extends FragmentActivity implements
         setContentView(R.layout.activity_maps);
         pointList = new ArrayList<>();
         mMapsPresenter = new MapsPresenter();
+        ButterKnife.bind(this);
         if (savedInstanceState != null) {
             pointList = savedInstanceState.getParcelableArrayList("marker list");
         }
@@ -84,6 +82,13 @@ public class MapsView extends FragmentActivity implements
             Toast.makeText(this, "User location outside SF, resetting to default.", Toast.LENGTH_SHORT).show();
         }
         mapFragment.getMapAsync(this);
+    }
+
+
+    @OnClick(R.id.btnReservations)
+    public void navigateToReservationList() {
+        Intent intent = new Intent(this, ReservationsActivityView.class);
+        startActivity(intent);
     }
 
     @Override
