@@ -135,7 +135,8 @@ public class MapsActivity extends FragmentActivity
     public void onMessageEvent(ParkingSpotReservedConfirmation event) {
         if(event.isReservationStatus()) {
             String reservedUntil = event.getReservedUntil();
-            reservedUntil = reservedUntil.substring(11,reservedUntil.length()-11);
+
+            reservedUntil = reservedUntil.substring(11,reservedUntil.indexOf(".")+2);
             Toast.makeText(this, "Parking space reserved until "+reservedUntil, Toast.LENGTH_SHORT).show();
             fetchParkingSpacesNearUser();
         } else {
@@ -210,7 +211,10 @@ public class MapsActivity extends FragmentActivity
         Button btnParkingSpaceReserve = (Button) snackView.findViewById(R.id.btnParkingSpaceReserve);
         if (parkingSpace.getIsReserved()) {
             String reservedUntil = parkingSpace.getReservedUntil();
-            reservedUntil = reservedUntil.substring(11,reservedUntil.length()-11);
+            if (reservedUntil.indexOf(".") != -1) {
+                // account for outlier date strings
+                reservedUntil = reservedUntil.substring(11,reservedUntil.indexOf(".")+2);
+            }
             btnParkingSpaceReserve.setText("Reserved"+System.getProperty("line.separator")+"free at "+ reservedUntil);
             btnParkingSpaceReserve.setBackgroundColor(getResources().getColor(R.color.colorButtonDisabled));
         } else {
@@ -220,6 +224,10 @@ public class MapsActivity extends FragmentActivity
 
         btnParkingSpaceReserve.setOnClickListener(v -> {
             parkingSpace.setIsReserved(true);
+            //ToDo add ability for user to select duration of stay.
+            String reservedUntilString = DateUtils.dateStringFromNow(60); // Default reservation duration of 1 hour
+            Log.i(TAG, "new reserved until value: "+reservedUntilString);
+            parkingSpace.setReservedUntil(reservedUntilString);
             mDataManager.reserveParkingSpot(parkingSpace.getId(), parkingSpace);
         });
 
