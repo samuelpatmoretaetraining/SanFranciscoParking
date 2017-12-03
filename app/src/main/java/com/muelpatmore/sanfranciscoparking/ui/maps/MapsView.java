@@ -48,6 +48,7 @@ public class MapsView extends FragmentActivity implements
     private DataManager mDataManager;
     private GoogleMap mMap;
     private Marker userMarker;
+    private ArrayList<PointModel> pointList;
 
     private LatLng userLocation = DEFAULT_LOCATION;
 
@@ -56,11 +57,20 @@ public class MapsView extends FragmentActivity implements
         super.onCreate(savedInstanceState);
         EventBus.getDefault().register(this);
         setContentView(R.layout.activity_maps);
+        pointList = new ArrayList<>();
         mDataManager = new DataManager();
+        if (savedInstanceState != null) {
+            pointList = savedInstanceState.getParcelableArrayList("marker list");
+        }
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
+        if (savedInstanceState == null) {
+            // First incarnation of this activity.
+            mapFragment.setRetainInstance(true);
+        }
         mapFragment.getMapAsync(this);
+
     }
 
     /**
@@ -83,6 +93,7 @@ public class MapsView extends FragmentActivity implements
         mMap.setOnInfoWindowClickListener(this);
 
         fetchParkingSpacesNearUser();
+
     }
 
     private void plotAndFocusOnUser() {
@@ -93,8 +104,8 @@ public class MapsView extends FragmentActivity implements
                 .icon(BitmapDescriptorFactory
                         .defaultMarker(60f))
                 .draggable(true));
-//        mMap.moveCamera(CameraUpdateFactory.newLatLng(userLocation));
-//        mMap.moveCamera(CameraUpdateFactory.zoomTo(17f));
+
+        mMap.moveCamera(CameraUpdateFactory.zoomTo(17f));
         CameraPosition newCamPos = new CameraPosition(userLocation,
                 17f,
                 mMap.getCameraPosition().tilt, //use old tilt
@@ -152,6 +163,8 @@ public class MapsView extends FragmentActivity implements
     private void plotMapMarkers(ArrayList<PointModel> pointList) {
         // clear all markers on the map
         mMap.clear();
+        this.pointList.clear();
+        this.pointList = pointList;
         for (PointModel r : pointList) {
             float color, alpha;
             String snippet;
@@ -241,6 +254,11 @@ public class MapsView extends FragmentActivity implements
         layout.setPadding(0, 0, 0, 0);
         // Show the Snackbar
         snackbar.show();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
     }
 
     @Override
