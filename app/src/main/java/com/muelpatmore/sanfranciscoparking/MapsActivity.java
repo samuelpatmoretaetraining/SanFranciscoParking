@@ -212,7 +212,7 @@ public class MapsActivity extends FragmentActivity
         if (parkingSpace.getIsReserved()) {
             String reservedUntil = parkingSpace.getReservedUntil();
             if (reservedUntil.indexOf(".") != -1) {
-                // account for outlier date strings
+                // account for outlier date string
                 reservedUntil = reservedUntil.substring(11,reservedUntil.indexOf(".")+2);
             }
             btnParkingSpaceReserve.setText("Reserved"+System.getProperty("line.separator")+"free at "+ reservedUntil);
