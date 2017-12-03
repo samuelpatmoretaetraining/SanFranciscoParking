@@ -34,6 +34,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MapsView extends FragmentActivity implements
         MapsViewInterface,
@@ -69,6 +70,11 @@ public class MapsView extends FragmentActivity implements
             // First incarnation of this activity.
             mapFragment.setRetainInstance(true);
         }
+        if (userLocation == null || !SAN_FRANCISCO.contains(userLocation)) {
+            userLocation = DEFAULT_LOCATION;
+            Log.e(TAG, "User location outside SF, resetting to default.");
+            Toast.makeText(this, "User location outside SF, resetting to default.", Toast.LENGTH_SHORT).show();
+        }
         mapFragment.getMapAsync(this);
 
     }
@@ -96,6 +102,13 @@ public class MapsView extends FragmentActivity implements
 
     }
 
+    /**
+     * Plot location of user on map as a gold marker. Marker can be dragged to change the user's
+     * chosen location and refresh the map.
+     *
+     * User location is reset to application default value if it is null or outside the set bounds
+     * of San Francisco.
+     */
     private void plotAndFocusOnUser() {
         userMarker = mMap.addMarker(new MarkerOptions()
                 .position(userLocation)
@@ -160,11 +173,18 @@ public class MapsView extends FragmentActivity implements
         }
     }
 
-    private void plotMapMarkers(ArrayList<PointModel> pointList) {
+    /**
+     * Plots a list of PointModel objects representing parking spaces to the map as custom markers.
+     * All spaces display the Parking Spot id in an info bubble on click along with their reserved
+     * status. Free spaces are green while reserved spaces are red and partially transparent.
+     *
+     * @param pointList Set of PointModel objects to plot on map.
+     */
+    private void plotMapMarkers(List<PointModel> pointList) {
         // clear all markers on the map
         mMap.clear();
         this.pointList.clear();
-        this.pointList = pointList;
+        this.pointList = new ArrayList<>(pointList);
         for (PointModel r : pointList) {
             float color, alpha;
             String snippet;
@@ -193,7 +213,6 @@ public class MapsView extends FragmentActivity implements
     public void onStop() {
         super.onStop();
         EventBus.getDefault().unregister(this);
-        mDataManager.onStop();
     }
 
     @Override
