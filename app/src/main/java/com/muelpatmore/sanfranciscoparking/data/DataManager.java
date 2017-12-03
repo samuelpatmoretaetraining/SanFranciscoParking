@@ -7,20 +7,27 @@ import com.muelpatmore.sanfranciscoparking.data.network.APIService;
 import com.muelpatmore.sanfranciscoparking.data.network.networkmodels.ParkingSpaceModel;
 import com.muelpatmore.sanfranciscoparking.data.prefs.PreferencesHelper;
 import com.muelpatmore.sanfranciscoparking.data.prefs.PreferencesHelperInterface;
+import com.muelpatmore.sanfranciscoparking.data.realm.RealmHelper;
+import com.muelpatmore.sanfranciscoparking.data.realm.RealmHelperInterface;
+import com.muelpatmore.sanfranciscoparking.data.realm.realmobjects.RealmReservation;
+
+import java.util.ArrayList;
 
 /**
  * Created by Samuel on 01/12/2017.
  */
 
-public class DataManager implements DataManagerInterface, PreferencesHelperInterface {
+public class DataManager implements DataManagerInterface {
 
     private final APIService mAPIService;
     private final PreferencesHelperInterface mPreferencesHelper;
+    private final RealmHelperInterface mRealmHelper;
     private final MyFirebaseMessagingService mMyFirebaseMessagingService;
 
     public DataManager() {
         mAPIService = new APIService();
         mPreferencesHelper = new PreferencesHelper(ParkingApp.getContext());
+        mRealmHelper = new RealmHelper(ParkingApp.getContext());
         mMyFirebaseMessagingService = new MyFirebaseMessagingService();
     }
 
@@ -65,5 +72,15 @@ public class DataManager implements DataManagerInterface, PreferencesHelperInter
     @Override
     public LatLng getLocation() {
         return mPreferencesHelper.getLocation();
+    }
+
+    @Override
+    public void saveReservation(RealmReservation reservation) {
+        mRealmHelper.saveReservation(reservation);
+    }
+
+    @Override
+    public ArrayList<RealmReservation> getReservations() {
+        return mRealmHelper.getReservations();
     }
 }
