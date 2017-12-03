@@ -223,10 +223,6 @@ public class MapsView extends FragmentActivity implements
         mMapsPresenter.onDetach();
     }
 
-    public Context getContext() {
-        return this.getContext();
-    }
-
     /**
      * On click event on an info bubble pass request up to presenter.
      * @param marker

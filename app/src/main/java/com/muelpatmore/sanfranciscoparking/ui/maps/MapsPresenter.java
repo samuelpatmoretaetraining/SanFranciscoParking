@@ -112,6 +112,7 @@ public class MapsPresenter<V extends MapsViewInterface> implements MapsPresenter
 
             reservedUntil = reservedUntil.substring(11,reservedUntil.indexOf("."));
             view.showMessage("Parking space reserved until "+reservedUntil);
+            mDataManager.sendReservationNotification("Parking spot reserved till: "+reservedUntil);
             fetchParkingSpacesNear(view.getUserLocation());
         } else {
             view.showMessage("Reservation failed, please try again");

@@ -1,5 +1,7 @@
 package com.muelpatmore.sanfranciscoparking.data;
 
+import android.content.Context;
+
 import com.muelpatmore.sanfranciscoparking.data.network.APIServiceInterface;
 
 /**
@@ -7,4 +9,5 @@ import com.muelpatmore.sanfranciscoparking.data.network.APIServiceInterface;
  */
 
 public interface DataManagerInterface extends APIServiceInterface {
+    void sendReservationNotification(String messageBody);
 }

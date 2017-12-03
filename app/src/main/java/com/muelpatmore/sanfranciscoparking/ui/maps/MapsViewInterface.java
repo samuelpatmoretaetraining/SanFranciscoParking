@@ -19,7 +19,6 @@ public interface MapsViewInterface extends MvpView {
     void showParkingSpaceDetails(ParkingSpaceModel parkingSpace);
     void plotMapMarkers(List<PointModel> pointList);
 
-    Context getContext();
     LatLng getUserLocation();
     void setUserLocation(LatLng userLocation);
     GoogleMap getMap();

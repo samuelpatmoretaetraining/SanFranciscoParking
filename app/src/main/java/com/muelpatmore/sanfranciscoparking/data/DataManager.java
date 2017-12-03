@@ -1,5 +1,7 @@
 package com.muelpatmore.sanfranciscoparking.data;
 
+import android.content.Context;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.muelpatmore.sanfranciscoparking.data.network.APIService;
 import com.muelpatmore.sanfranciscoparking.data.network.networkmodels.ParkingSpaceModel;
@@ -11,9 +13,11 @@ import com.muelpatmore.sanfranciscoparking.data.network.networkmodels.ParkingSpa
 public class DataManager implements DataManagerInterface {
 
     private final APIService mAPIService;
+    private final MyFirebaseMessagingService mMyFirebaseMessagingService;
 
     public DataManager() {
         mAPIService = new APIService();
+        mMyFirebaseMessagingService = new MyFirebaseMessagingService();
     }
 
     @Override
@@ -32,5 +36,10 @@ public class DataManager implements DataManagerInterface {
 
     public void onStop() {
         mAPIService.clearRequests();
+    }
+
+    @Override
+    public void sendReservationNotification(String messageBody) {
+        mMyFirebaseMessagingService.sendReservationNotification(messageBody);
     }
 }
