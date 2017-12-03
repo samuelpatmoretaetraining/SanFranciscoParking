@@ -7,10 +7,12 @@ package com.muelpatmore.sanfranciscoparking.data.messages;
 public class ParkingSpotReservedConfirmation {
     private final boolean reservationStatus;
     private final String reservedUntil;
+    private final int id;
 
-    public ParkingSpotReservedConfirmation(boolean reservationStatus, String reservedUntil) {
+    public ParkingSpotReservedConfirmation(boolean reservationStatus, String reservedUntil, int id) {
         this.reservationStatus = reservationStatus;
         this.reservedUntil = reservedUntil;
+        this.id = id;
     }
 
     public boolean isReservationStatus() {
@@ -19,5 +21,9 @@ public class ParkingSpotReservedConfirmation {
 
     public String getReservedUntil() {
         return reservedUntil;
+    }
+
+    public int getId() {
+        return id;
     }
 }

@@ -115,7 +115,8 @@ public class APIService implements APIServiceInterface {
                             EventBus.getDefault().post(
                                     new ParkingSpotReservedConfirmation(
                                             parkingSpaceModel1.getIsReserved(),
-                                            parkingSpaceModel1.getReservedUntil()));
+                                            parkingSpaceModel1.getReservedUntil(),
+                                            parkingSpaceModel.getId()));
                         }, throwable -> {
                             Log.i(TAG, "Exception thrown in reserveParkingSpot("+id+")");
                             throwable.printStackTrace();

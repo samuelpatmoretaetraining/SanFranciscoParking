@@ -8,6 +8,8 @@ import com.muelpatmore.sanfranciscoparking.data.messages.IndividualParkingSpotRe
 import com.muelpatmore.sanfranciscoparking.data.messages.ParkingSpotReservedConfirmation;
 import com.muelpatmore.sanfranciscoparking.data.messages.ParkingSpotsDataReceived;
 import com.muelpatmore.sanfranciscoparking.data.network.networkmodels.ParkingSpaceModel;
+import com.muelpatmore.sanfranciscoparking.data.realm.realmobjects.RealmReservation;
+import com.muelpatmore.sanfranciscoparking.ui.utils.DateUtils;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -113,7 +115,11 @@ public class MapsPresenter<V extends MapsViewInterface> implements MapsPresenter
             reservedUntil = reservedUntil.substring(11,reservedUntil.indexOf("."));
             view.showMessage("Parking space reserved until "+reservedUntil);
             mDataManager.sendReservationNotification("Parking spot reserved till: "+reservedUntil);
+
             fetchParkingSpacesNear(view.getUserLocation());
+            // Store reservation in Realm database
+            RealmReservation entry = new RealmReservation(event.getId(), DateUtils.stringToDate(event.getReservedUntil()));
+            mDataManager.saveReservation(entry);
         } else {
             view.showMessage("Reservation failed, please try again");
         }

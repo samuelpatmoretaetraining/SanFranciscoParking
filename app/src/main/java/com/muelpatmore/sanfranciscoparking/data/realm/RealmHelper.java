@@ -21,8 +21,6 @@ public class RealmHelper implements RealmHelperInterface{
 
     private static final String TAG = "RealmHelper";
 
-    private Realm mRealm;
-
     public RealmHelper(Context context) {
         Realm.init(context);
     }
@@ -30,6 +28,7 @@ public class RealmHelper implements RealmHelperInterface{
     public void saveReservation(RealmReservation reservation) {
         try(Realm realmInstance = Realm.getDefaultInstance()) {
             realmInstance.executeTransaction((realm) -> realm.insertOrUpdate(reservation));
+            Log.i(TAG, "Reservation stored in Realm Database.");
         }
     }
 
@@ -45,7 +44,7 @@ public class RealmHelper implements RealmHelperInterface{
                 reservations.add(realmReservation);
                 Log.i(TAG, ""+realmReservation.getId());
             }
-
+            Log.i(TAG,reservations.size()+" reservations retrieved from database.");
             return reservations;
         }
     }
