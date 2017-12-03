@@ -32,6 +32,7 @@ import com.muelpatmore.sanfranciscoparking.data.messages.ParkingSpotsDataReceive
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,7 +77,20 @@ public class MapsView extends FragmentActivity implements
             Toast.makeText(this, "User location outside SF, resetting to default.", Toast.LENGTH_SHORT).show();
         }
         mapFragment.getMapAsync(this);
+    }
 
+    /**
+     * Set new location of user.
+     * Will reset to default if the position is null or outside the bounds of San Francisco.
+     */
+    public void setUserLocation(@NotNull LatLng userLocation) {
+        if (userLocation != null && SAN_FRANCISCO.contains(userLocation)) {
+            this.userLocation = userLocation;
+        } else {
+            this.userLocation = DEFAULT_LOCATION;
+            Log.e(TAG, "User location outside SF, resetting to default.");
+            Toast.makeText(this, "User location outside SF, resetting to default.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**
