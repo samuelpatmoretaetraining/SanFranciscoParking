@@ -20,9 +20,11 @@ import io.realm.RealmResults;
 public class RealmHelper implements RealmHelperInterface{
 
     private static final String TAG = "RealmHelper";
+    private Realm realm;
 
     public RealmHelper(Context context) {
         Realm.init(context);
+        realm = Realm.getDefaultInstance();
     }
 
     public void saveReservation(RealmReservation reservation) {
@@ -32,18 +34,21 @@ public class RealmHelper implements RealmHelperInterface{
         }
     }
 
+    @Override
     public ArrayList<RealmReservation> getReservations() {
         try(Realm realmInstance = Realm.getDefaultInstance()) {
-                ArrayList<RealmReservation> reservations = new ArrayList<RealmReservation>();
+            ArrayList<RealmReservation> reservations = new ArrayList<RealmReservation>();
 
             RealmResults<RealmReservation> realmReservations =
                     realmInstance.where(RealmReservation.class).findAll();
 
+            reservations.addAll(realmReservations);
+
             // transfer items from realmResults to customers
-            for(RealmReservation realmReservation : realmReservations) {
-                reservations.add(realmReservation);
-                Log.i(TAG, ""+realmReservation.getId());
-            }
+//            for(RealmReservation realmReservation : realmReservations) {
+//                reservations.add(realmReservation);
+//                Log.i(TAG, ""+realmReservation.getId());
+//            }
             Log.i(TAG,reservations.size()+" reservations retrieved from database.");
             return reservations;
         }

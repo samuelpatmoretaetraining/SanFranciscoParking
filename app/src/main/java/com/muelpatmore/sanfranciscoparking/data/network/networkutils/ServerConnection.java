@@ -1,7 +1,11 @@
 package com.muelpatmore.sanfranciscoparking.data.network.networkutils;
 
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import com.muelpatmore.sanfranciscoparking.ParkingApp;
 
+import java.io.File;
+
+import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -27,5 +31,6 @@ public class ServerConnection {
                 .client(okHttpClient)
                 .build();
 
-        return retrofit.create(RequestInterface.class);    }
+        return retrofit.create(RequestInterface.class);
+    }
 }
