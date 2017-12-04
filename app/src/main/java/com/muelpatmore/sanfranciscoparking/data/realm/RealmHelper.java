@@ -21,30 +21,25 @@ public class RealmHelper implements RealmHelperInterface{
     private Realm realm;
 
     public RealmHelper(Context context) {
-        Realm.init(context);
-        RealmConfiguration realmConfig = new RealmConfiguration.Builder()
-                .name("parking.realm")
-                .schemaVersion(1)
-                .deleteRealmIfMigrationNeeded()
-                .build();
-        Realm.setDefaultConfiguration(realmConfig);
         this.realm = Realm.getDefaultInstance();
     }
 
+    /**
+     * Store a single RealmReservation object in the Realm database.
+     * Stored values are not checked in anyway for duplicity as identical entries are allowed.
+     */
     @Override
     public void saveReservation(RealmReservation reservation) {
         realm.executeTransaction(realm1 -> realm.copyToRealm(reservation));
     }
 
+    /**
+     * Retrieve all RealmReservation objects currently in the database.
+     */
     @Override
     public ArrayList<RealmReservation> getReservations() {
-        ArrayList<RealmReservation> reservations = new ArrayList<>();
-
         RealmResults<RealmReservation> realmData = realm.where(RealmReservation.class).findAll();
-        for(RealmReservation r : realmData){
-            reservations.add(new RealmReservation(r.getId()));
-        }
-
+        ArrayList<RealmReservation> reservations = new ArrayList<>(realmData.subList(0, realmData.size()));
         return reservations;
     }
 

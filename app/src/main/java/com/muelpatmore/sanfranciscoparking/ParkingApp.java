@@ -6,6 +6,9 @@ import android.content.Context;
 import com.muelpatmore.sanfranciscoparking.data.injection.DaggerPresenterComponent;
 import com.muelpatmore.sanfranciscoparking.data.injection.PresenterComponent;
 
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
+
 /**
  * Created by Samuel on 02/12/2017.
  */
@@ -19,9 +22,17 @@ public class ParkingApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        instance = this;
         mContext = this.getApplicationContext();
         presenterComponent = DaggerPresenterComponent.create();
-        instance = this;
+
+        Realm.init(mContext);
+        RealmConfiguration realmConfig = new RealmConfiguration.Builder()
+                .name("parking.realm")
+                .schemaVersion(1)
+                .deleteRealmIfMigrationNeeded()
+                .build();
+        Realm.setDefaultConfiguration(realmConfig);
     }
 
     public static Context getContext() {
