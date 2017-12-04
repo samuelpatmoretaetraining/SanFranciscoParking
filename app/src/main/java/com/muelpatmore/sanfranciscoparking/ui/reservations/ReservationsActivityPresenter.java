@@ -1,5 +1,7 @@
 package com.muelpatmore.sanfranciscoparking.ui.reservations;
 
+import android.util.Log;
+
 import com.muelpatmore.sanfranciscoparking.data.DataManager;
 import com.muelpatmore.sanfranciscoparking.data.realm.realmobjects.RealmReservation;
 import com.muelpatmore.sanfranciscoparking.ui.maps.MapsViewInterface;
@@ -25,11 +27,13 @@ public class ReservationsActivityPresenter implements ReservationsActivityPresen
 
     @Override
     public void onAttach(ReservationsActivityViewInterface mvpView) {
+        Log.i(TAG, "onAttach");
         view = mvpView;
     }
 
     @Override
     public void requestReservationList() {
+        Log.i(TAG, "requestReservationList");
         ArrayList<RealmReservation> reservationList =  mDataManager.getReservations();
         view.setReservationList(reservationList);
         view.refreshReservationList();

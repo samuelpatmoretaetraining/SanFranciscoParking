@@ -48,18 +48,11 @@ public class ReservationsActivityView extends Activity implements ReservationsAc
 
     @Override
     public void refreshReservationList() {
-        if (reservationList.size() < 1) {
-            return;
-        }
         rcReservations.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
 
         mReservationsAdapter = new ReservationsRecyclerAdapter(reservationList, 0, this);
         rcReservations.setAdapter(mReservationsAdapter);
         mReservationsAdapter.notifyDataSetChanged();
-//        rcReservations.setAdapter(new ReservationsRecyclerAdapter(
-//                reservationList,
-//                R.layout.reservation_card,
-//                getApplicationContext()));
     }
 
     @Override

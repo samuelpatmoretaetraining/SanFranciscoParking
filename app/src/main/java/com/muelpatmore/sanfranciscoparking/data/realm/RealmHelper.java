@@ -38,8 +38,11 @@ public class RealmHelper implements RealmHelperInterface{
      */
     @Override
     public ArrayList<RealmReservation> getReservations() {
+        ArrayList<RealmReservation> reservations = new ArrayList<>();
         RealmResults<RealmReservation> realmData = realm.where(RealmReservation.class).findAll();
-        ArrayList<RealmReservation> reservations = new ArrayList<>(realmData.subList(0, realmData.size()));
+        for (RealmReservation r : realmData) {
+            reservations.add(new RealmReservation(r.getId()));
+        }
         return reservations;
     }
 
