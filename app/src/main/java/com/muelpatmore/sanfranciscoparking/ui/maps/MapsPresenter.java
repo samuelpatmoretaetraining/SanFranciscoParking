@@ -29,8 +29,8 @@ public class MapsPresenter<V extends MapsViewInterface> implements MapsPresenter
     /**
      * Constructor for MapsPresenter class.
      */
-    public MapsPresenter() {
-        mDataManager = new DataManager();
+    public MapsPresenter(DataManager dataManager) {
+        this.mDataManager = dataManager;
         EventBus.getDefault().register(this);
     }
 

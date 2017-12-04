@@ -23,6 +23,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.muelpatmore.sanfranciscoparking.ParkingApp;
 import com.muelpatmore.sanfranciscoparking.data.network.networkmodels.ParkingSpaceModel;
 import com.muelpatmore.sanfranciscoparking.data.network.networkmodels.PointModel;
 import com.muelpatmore.sanfranciscoparking.ui.reservations.ReservationsActivityView;
@@ -31,6 +32,8 @@ import com.muelpatmore.sanfranciscoparking.R;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -46,7 +49,8 @@ public class MapsView extends FragmentActivity implements
     private static final LatLngBounds SAN_FRANCISCO = new LatLngBounds(
             new LatLng(37.692100, -122.521307), new LatLng(37.813489, -122.354833));
 
-    private MapsPresenter mMapsPresenter;
+    @Inject
+    public MapsPresenter mMapsPresenter;
     private GoogleMap mMap;
     private Marker userMarker;
     private ArrayList<PointModel> pointList;
@@ -64,8 +68,9 @@ public class MapsView extends FragmentActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         pointList = new ArrayList<>();
-        mMapsPresenter = new MapsPresenter();
         ButterKnife.bind(this);
+        injectDagger();
+
         if (savedInstanceState != null) {
             pointList = savedInstanceState.getParcelableArrayList("marker list");
         }
@@ -82,6 +87,10 @@ public class MapsView extends FragmentActivity implements
             Toast.makeText(this, "User location outside SF, resetting to default.", Toast.LENGTH_SHORT).show();
         }
         mapFragment.getMapAsync(this);
+    }
+
+    private void injectDagger() {
+        ParkingApp.getInstance().getPresenterComponent().inject(this);
     }
 
     @Override
