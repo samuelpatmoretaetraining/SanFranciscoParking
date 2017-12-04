@@ -4,6 +4,7 @@ package com.muelpatmore.sanfranciscoparking.data.injection;
  * Created by Samuel on 04/12/2017.
  */
 
+import com.muelpatmore.sanfranciscoparking.ParkingApp;
 import com.muelpatmore.sanfranciscoparking.data.DataManager;
 import com.muelpatmore.sanfranciscoparking.ui.maps.MapsPresenter;
 

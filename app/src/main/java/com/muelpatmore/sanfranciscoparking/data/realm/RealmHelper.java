@@ -18,38 +18,34 @@ import io.realm.RealmResults;
  */
 
 public class RealmHelper implements RealmHelperInterface{
-
-    private static final String TAG = "RealmHelper";
     private Realm realm;
 
     public RealmHelper(Context context) {
         Realm.init(context);
-
-        realm = Realm.getDefaultInstance();
+        RealmConfiguration realmConfig = new RealmConfiguration.Builder()
+                .name("parking.realm")
+                .schemaVersion(1)
+                .deleteRealmIfMigrationNeeded()
+                .build();
+        Realm.setDefaultConfiguration(realmConfig);
+        this.realm = Realm.getDefaultInstance();
     }
 
+    @Override
     public void saveReservation(RealmReservation reservation) {
-        realm.executeTransaction(realm -> realm.copyToRealmOrUpdate(reservation));
-        Log.i(TAG, "Reservation stored in Realm Database.");
+        realm.executeTransaction(realm1 -> realm.copyToRealm(reservation));
     }
 
     @Override
     public ArrayList<RealmReservation> getReservations() {
-        Realm realmInstance = Realm.getDefaultInstance();
-        ArrayList<RealmReservation> reservations = new ArrayList<RealmReservation>();
+        ArrayList<RealmReservation> reservations = new ArrayList<>();
 
-        RealmResults<RealmReservation> realmReservations =
-                realmInstance.where(RealmReservation.class).findAll();
-
-
-        // transfer items from realmResults to customers
-        for(RealmReservation realmReservation : realmReservations) {
-            reservations.add(realmReservation);
-            Log.i(TAG, ""+realmReservation.getId());
+        RealmResults<RealmReservation> realmData = realm.where(RealmReservation.class).findAll();
+        for(RealmReservation r : realmData){
+            reservations.add(new RealmReservation(r.getId()));
         }
-        Log.i(TAG,reservations.size()+" reservations retrieved from database.");
-        return reservations;
 
+        return reservations;
     }
 
 }

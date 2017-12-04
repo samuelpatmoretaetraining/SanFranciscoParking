@@ -11,27 +11,13 @@ import io.realm.annotations.PrimaryKey;
  * Created by Samuel on 03/12/2017.
  */
 
-public class RealmReservation extends RealmObject{
-    @PrimaryKey
-    private String timestamp;
+public class RealmReservation extends RealmObject{;
     private int id;
-    private Date reservedUntil;
 
     public RealmReservation() {}
 
-    public String getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(String timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public RealmReservation(int id, Date reservedUntil) {
+    public RealmReservation(int id) {
         this.id = id;
-        this.reservedUntil = reservedUntil;
-        timestamp = String.valueOf(System.currentTimeMillis());
-
     }
 
     public int getId() {
@@ -40,13 +26,5 @@ public class RealmReservation extends RealmObject{
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public Date getReservedUntil() {
-        return reservedUntil;
-    }
-
-    public void setReservedUntil(Date reservedUntil) {
-        this.reservedUntil = reservedUntil;
     }
 }

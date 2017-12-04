@@ -48,8 +48,7 @@ public class ReservationsRecyclerAdapter
         holder.tvReservationSpaceId.setText(
                 "Parking space id: "+reservationList.get(position).getId());
 
-        holder.tvTimeExpires.setText(
-                DateUtils.dateToString(reservationList.get(position).getReservedUntil()));
+        //holder.tvTimeExpires.setText(DateUtils.dateToString(reservationList.get(position).getReservedUntil()));
     }
 
     @Override

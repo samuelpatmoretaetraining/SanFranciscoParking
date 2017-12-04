@@ -20,6 +20,7 @@ public class ReservationsActivityView extends Activity implements ReservationsAc
     private final static String TAG = "ReservationsActivityView";
 
     private ReservationsActivityPresenterInterface mReservationsPresenter;
+    private ReservationsRecyclerAdapter mReservationsAdapter;
     private ArrayList<RealmReservation> reservationList;
 
     @BindView(R.id.rcReservations) RecyclerView rcReservations;
@@ -51,10 +52,14 @@ public class ReservationsActivityView extends Activity implements ReservationsAc
             return;
         }
         rcReservations.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-        rcReservations.setAdapter(new ReservationsRecyclerAdapter(
-                reservationList,
-                R.layout.reservation_card,
-                getApplicationContext()));
+
+        mReservationsAdapter = new ReservationsRecyclerAdapter(reservationList, 0, this);
+        rcReservations.setAdapter(mReservationsAdapter);
+        mReservationsAdapter.notifyDataSetChanged();
+//        rcReservations.setAdapter(new ReservationsRecyclerAdapter(
+//                reservationList,
+//                R.layout.reservation_card,
+//                getApplicationContext()));
     }
 
     @Override

@@ -122,7 +122,7 @@ public class MapsPresenter<V extends MapsViewInterface> implements MapsPresenter
 
             fetchParkingSpacesNear(view.getUserLocation());
             // Store reservation in Realm database
-            RealmReservation entry = new RealmReservation(event.getId(), DateUtils.stringToDate(event.getReservedUntil()));
+            RealmReservation entry = new RealmReservation(event.getId());
             mDataManager.saveReservation(entry);
         } else {
             view.showMessage("Reservation failed, please try again");
