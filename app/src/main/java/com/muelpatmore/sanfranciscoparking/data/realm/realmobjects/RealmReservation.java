@@ -13,11 +13,22 @@ import io.realm.annotations.PrimaryKey;
 
 public class RealmReservation extends RealmObject{;
     private int id;
+    private String reservedUntil;
 
     public RealmReservation() {}
 
-    public RealmReservation(int id) {
+    public String getReservedUntil() {
+        return reservedUntil;
+    }
+
+    public void setReservedUntil(String reservedUntil) {
+        this.reservedUntil = reservedUntil;
+    }
+
+    public RealmReservation(int id, String reservedUntil) {
         this.id = id;
+        this.reservedUntil = reservedUntil;
+
     }
 
     public int getId() {

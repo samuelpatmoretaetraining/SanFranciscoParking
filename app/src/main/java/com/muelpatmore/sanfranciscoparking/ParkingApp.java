@@ -28,8 +28,7 @@ public class ParkingApp extends Application {
 
         Realm.init(mContext);
         RealmConfiguration realmConfig = new RealmConfiguration.Builder()
-                .name("parking.realm")
-                .schemaVersion(1)
+                .schemaVersion(2)
                 .deleteRealmIfMigrationNeeded()
                 .build();
         Realm.setDefaultConfiguration(realmConfig);
