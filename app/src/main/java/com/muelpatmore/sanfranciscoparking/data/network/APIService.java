@@ -56,7 +56,7 @@ public class APIService implements APIServiceInterface {
                     LatLng stop = new LatLng(s.getLat(), s.getLng());
                     double distance = SphericalUtil.computeDistanceBetween(location, stop);
                     //Log.i(TAG, ""+s.getId()+" -distance-"+distance+"m");
-                    return distance < 250.0f;
+                    return distance < 350.0f;
                 })
                 .map(s -> {
                     /*Log.i(TAG, "Conversion to PointModel");*/

@@ -84,6 +84,11 @@ public class MapsView extends FragmentActivity implements
         mapFragment.getMapAsync(this);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //mMapsPresenter.onResume();
+    }
 
     @OnClick(R.id.btnReservations)
     public void navigateToReservationList() {

@@ -21,7 +21,6 @@ public class ReservationsActivityPresenter implements ReservationsActivityPresen
 
     public ReservationsActivityPresenter() {
         mDataManager = new DataManager();
-        //EventBus.getDefault().register(this);
     }
 
     @Override
@@ -39,6 +38,5 @@ public class ReservationsActivityPresenter implements ReservationsActivityPresen
     @Override
     public void onDetach() {
         mDataManager.onStop();
-        //EventBus.getDefault().unregister(this);
     }
 }
