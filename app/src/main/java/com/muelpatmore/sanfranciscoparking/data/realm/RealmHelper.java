@@ -41,13 +41,12 @@ public class RealmHelper implements RealmHelperInterface{
         RealmResults<RealmReservation> realmReservations =
                 realmInstance.where(RealmReservation.class).findAll();
 
-        reservations.addAll(realmReservations);
 
         // transfer items from realmResults to customers
-//            for(RealmReservation realmReservation : realmReservations) {
-//                reservations.add(realmReservation);
-//                Log.i(TAG, ""+realmReservation.getId());
-//            }
+        for(RealmReservation realmReservation : realmReservations) {
+            reservations.add(realmReservation);
+            Log.i(TAG, ""+realmReservation.getId());
+        }
         Log.i(TAG,reservations.size()+" reservations retrieved from database.");
         return reservations;
 

@@ -109,6 +109,7 @@ public class MapsView extends FragmentActivity implements
     protected void onStart() {
         super.onStart();
         mMapsPresenter.onAttach(this);
+        mMapsPresenter.onStart();
     }
 
     @Override

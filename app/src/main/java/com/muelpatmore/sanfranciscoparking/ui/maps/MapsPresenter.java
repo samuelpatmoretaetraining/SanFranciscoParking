@@ -31,6 +31,10 @@ public class MapsPresenter<V extends MapsViewInterface> implements MapsPresenter
      */
     public MapsPresenter(DataManager dataManager) {
         this.mDataManager = dataManager;
+    }
+
+    public void onStart() {
+
         EventBus.getDefault().register(this);
     }
 
