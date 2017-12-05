@@ -20,12 +20,15 @@ dependencies:
         - if [ ! -e $ANDROID_HOME/tools/bin/sdkmanager ]; then echo y | android update sdk --no-ui --all --filter tools; fi
         
         # Pre-accept Android SDK components licenses
+
+        yes | sudo sdkmanager --licenses
+        - echo -y | sdkmanager "extras;m2repository;com;android;support;constraint;constraint-layout;1.0.2"
+        - echo -y | sdkmanager "extras;m2repository;com;android;support;constraint;constraint-layout-solver;1.0.2"
+
         - mkdir "$ANDROID_HOME/licenses" || true
         - echo -y "\n8933bad161af4178b1185d1a37fbf41ea5269c55" > "$ANDROID_HOME/licenses/android-sdk-license"
         - echo -y "\n8933bad161af4178b1185d1a37fbf41ea5269c55" > "$ANDROID_SDK/licenses/android-sdk-license"
 
-        - echo -y | sdkmanager "extras;m2repository;com;android;support;constraint;constraint-layout;1.0.2"
-        - echo -y | sdkmanager "extras;m2repository;com;android;support;constraint;constraint-layout-solver;1.0.2"
 
         # Install all the required SDK components
         - echo y | $ANDROID_HOME/tools/bin/sdkmanager --verbose "platform-tools" "build-tools;"$ANDROID_BUILD_TOOLS "extras;google;m2repository"
