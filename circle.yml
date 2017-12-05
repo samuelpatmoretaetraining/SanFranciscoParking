@@ -2,7 +2,7 @@ machine:
     java:
         version: oraclejdk8
     environment:
-        ANDROID_HOME: C:\Users\Samuel\AppData\Local\Android\Sdk
+        ANDROID_HOME: C:\Users\Samuel\AppData\Local\Android
         ANDROID_BUILD_TOOLS: 26.0.2
         APPLICATION_ID: com.muelpatmore.sanfranciscoparking
         FABRIC_API_KEY: 0000000000000000000000000000000000000000
